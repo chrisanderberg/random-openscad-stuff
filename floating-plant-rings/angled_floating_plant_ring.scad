@@ -24,6 +24,8 @@ sector_radius = ring_outer_radius + 1;
 // Extra height to guarantee the clipping solid fully covers the ring.
 sector_height = cross_section_total_height + 1;
 sector_step = 5; // Degrees per segment for the clipping sector arc.
+side_extension = cross_section_width * 2;
+side_length = ring_outer_radius + side_extension;
 
 // Calculate triangle and rectangle heights from total height and angle.
 // Triangle height = tan(angle) * (width / 2).
@@ -64,10 +66,22 @@ module side_profile() {
 }
 
 module angled_floating_ring(angle = ring_angle) {
-    union() {
-        ring_slice(angle);
-        radial_side(length = ring_outer_radius, side_angle = 0);
-        radial_side(length = ring_outer_radius, side_angle = angle);
+    intersection() {
+        intersection() {
+            difference() {
+                union() {
+                    ring_slice(angle);
+                    radial_side(length = side_length, side_angle = 0);
+                    radial_side(length = side_length, side_angle = angle);
+                }
+                first_radial_vertical_cleanup_volume();
+                first_radial_angled_top_cleanup_volume();
+                second_radial_vertical_cleanup_volume();
+                second_radial_angled_top_cleanup_volume();
+            }
+            outer_arc_vertical_cleanup_volume();
+        }
+        outer_arc_angled_top_cleanup_volume();
     }
 }
 
@@ -94,17 +108,50 @@ module ring_sector(angle = ring_angle) {
 
 module radial_side(length = ring_outer_radius, side_angle = 0) {
     // Extrude the same profile along the radius to create a straight side.
+    radial_transform(side_angle)
+        translate([-cross_section_width / 2, 0, -side_extension])
+            linear_extrude(height = length) {
+                side_profile();
+            }
+}
+
+module radial_transform(side_angle = 0) {
     rotate([0, 0, side_angle])
         multmatrix([
             [0, 0, 1, 0],
             [1, 0, 0, 0],
             [0, 1, 0, 0],
             [0, 0, 0, 1]
-        ])
-            translate([-cross_section_width / 2, 0, 0])
-                linear_extrude(height = length) {
-                    side_profile();
-                }
+        ]) children();
+}
+
+module first_radial_vertical_cleanup_volume() {
+    // Large slab aligned to the first radial side (side_angle = 0).
+    translate([-ring_outer_radius, -ring_outer_radius - cross_section_width / 2, -cross_section_total_height])
+      cube([ring_outer_diameter, ring_outer_radius, cross_section_total_height * 3]);
+}
+
+module first_radial_angled_top_cleanup_volume() {
+    // Large angled slab aligned to the first radial side (side_angle = 0).
+    translate([0, 0, cross_section_total_height])
+    rotate([top_angle - 90, 0, 0])
+      translate([-ring_outer_radius, -ring_outer_radius, -cross_section_total_height])
+        cube([ring_outer_diameter, ring_outer_radius, cross_section_total_height * 3]);
+}
+
+module second_radial_vertical_cleanup_volume() {
+    rotate([0, 0, ring_angle])
+      translate([-ring_outer_radius, cross_section_width / 2, -cross_section_total_height])
+        cube([ring_outer_diameter, ring_outer_radius, cross_section_total_height * 3]);
+}
+
+module second_radial_angled_top_cleanup_volume() {
+    // Large angled slab aligned to the second radial side (side_angle = ring_angle).
+    rotate([0, 0, ring_angle])
+      translate([0, 0, cross_section_total_height])
+        rotate([-90 - top_angle, 0, 0])
+          translate([-ring_outer_radius, -ring_outer_radius, -cross_section_total_height])
+            cube([ring_outer_diameter, ring_outer_radius, cross_section_total_height * 3]);
 }
 
 module sector_2d(radius, angle, step) {
@@ -116,3 +163,19 @@ module sector_2d(radius, angle, step) {
 }
 
 angled_floating_ring();
+
+
+module outer_arc_vertical_cleanup_volume() {
+    translate([0, 0, cross_section_total_height / 2])
+        cylinder(h = cross_section_total_height * 3, r = ring_outer_radius, center = true);
+}
+
+module outer_arc_angled_top_cleanup_volume() {
+    // Cone matching the outer angled top surface.
+    extra_height = cross_section_total_height;
+    slope = (ring_outer_radius - ring_center_radius) / triangle_height;
+    total_height = triangle_height + extra_height;
+    bottom_radius = ring_center_radius + (slope * total_height);
+    translate([0, 0, rectangle_height - extra_height])
+        cylinder(h = total_height, r1 = bottom_radius, r2 = ring_center_radius);
+}
