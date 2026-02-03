@@ -1,7 +1,7 @@
 // Angled floating plant ring with a shaped cross-section.
 
 // ---------- Public parameters (mm) ----------
-ring_outer_diameter = 150;
+ring_outer_diameter = 300;
 cross_section_width = 8;
 cross_section_total_height = 8;
 top_angle = 30; // Angle of top surfaces in degrees.
@@ -26,6 +26,7 @@ sector_height = cross_section_total_height + 1;
 sector_step = 5; // Degrees per segment for the clipping sector arc.
 side_extension = cross_section_width * 2;
 side_length = ring_outer_radius + side_extension;
+radial_side_extra = 0.1;
 
 // Calculate triangle and rectangle heights from total height and angle.
 // Triangle height = tan(angle) * (width / 2).
@@ -65,15 +66,28 @@ module side_profile() {
     ]);
 }
 
-module angled_floating_ring(angle = ring_angle) {
+module radial_side_profile() {
+    // Slightly oversized for cleanup subtraction.
+    // Expand only the outer face (positive X) to avoid shifting inner face.
+    polygon(points = [
+        // Bottom-left
+        [0, 0],
+        // Bottom-right
+        [cross_section_width * 2, 0],
+        // Top-right (top of rectangle)
+        [cross_section_width * 2, cross_section_total_height],
+        // Top-center (peak of triangle)
+        [cross_section_width / 2, cross_section_total_height],
+        // Top-left (top of rectangle)
+        [0, rectangle_height]
+    ]);
+}
+
+module angled_floating_ring_cleaned(angle = ring_angle) {
     intersection() {
         intersection() {
             difference() {
-                union() {
-                    ring_slice(angle);
-                    radial_side(length = side_length, side_angle = 0);
-                    radial_side(length = side_length, side_angle = angle);
-                }
+                angled_floating_ring_union(angle);
                 first_radial_vertical_cleanup_volume();
                 first_radial_angled_top_cleanup_volume();
                 second_radial_vertical_cleanup_volume();
@@ -82,6 +96,15 @@ module angled_floating_ring(angle = ring_angle) {
             outer_arc_vertical_cleanup_volume();
         }
         outer_arc_angled_top_cleanup_volume();
+    }
+}
+
+module angled_floating_ring_union(angle = ring_angle) {
+    union() {
+        ring_slice(angle);
+        radial_side(length = side_length, side_angle = 0, reflect = true);
+        rotate([0, 0, angle])
+            radial_side(length = side_length, side_angle = angle);
     }
 }
 
@@ -106,24 +129,23 @@ module ring_sector(angle = ring_angle) {
     }
 }
 
-module radial_side(length = ring_outer_radius, side_angle = 0) {
+module radial_side(length = ring_outer_radius, side_angle = 0, reflect = false) {
     // Extrude the same profile along the radius to create a straight side.
-    radial_transform(side_angle)
-        translate([-cross_section_width / 2, 0, -side_extension])
+    rotate([0, 90, 0])
+    rotate([0, 0, 90])
+          if (reflect)
+            mirror([1, 0, 0])
+            translate([-cross_section_width / 2, 0, -side_extension])
+              linear_extrude(height = length) {
+                  radial_side_profile();
+              }
+          else
+            translate([-cross_section_width / 2, 0, -side_extension])
             linear_extrude(height = length) {
-                side_profile();
+                radial_side_profile();
             }
 }
 
-module radial_transform(side_angle = 0) {
-    rotate([0, 0, side_angle])
-        multmatrix([
-            [0, 0, 1, 0],
-            [1, 0, 0, 0],
-            [0, 1, 0, 0],
-            [0, 0, 0, 1]
-        ]) children();
-}
 
 module first_radial_vertical_cleanup_volume() {
     // Large slab aligned to the first radial side (side_angle = 0).
@@ -162,7 +184,8 @@ module sector_2d(radius, angle, step) {
     ));
 }
 
-angled_floating_ring();
+// angled_floating_ring_union();
+angled_floating_ring_cleaned();
 
 
 module outer_arc_vertical_cleanup_volume() {
