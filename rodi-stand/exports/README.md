@@ -2,7 +2,7 @@
 
 This directory holds two kinds of artifacts:
 
-- Legacy STL and 3MF files copied from the older `Documents/OpenSCAD` workspace
+- Legacy STL and 3MF files copied from the older flat `OpenSCAD` workspace
   for migration verification.
 - New validation renders written here during migration checks, typically named
   `validation-*.stl`.

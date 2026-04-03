@@ -3,7 +3,7 @@
 ## Overview
 This project models a cache pot with interchangeable panel patterns. The base
 geometry and the decorative panel variants were migrated from the older
-`Documents/OpenSCAD` workspace.
+`OpenSCAD` workspace that now lives in this repository.
 
 ## Current shape
 - `models/` contains the core and panel variant source files.

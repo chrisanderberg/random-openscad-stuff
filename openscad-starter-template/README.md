@@ -25,8 +25,8 @@ If you clone this repo directly, replace `README.md`, `PROJECT.md`,
 Create a new project by copying this template without its Git history:
 
 ```bash
-/Users/christopheranderberg/projects/3Dmodels/openscad-starter-template/scripts/bootstrap-new-project.sh \
-  /Users/christopheranderberg/projects/3Dmodels/my-new-project \
+/Users/christopheranderberg/projects/random-openscad-stuff/openscad-starter-template/scripts/bootstrap-new-project.sh \
+  /Users/christopheranderberg/projects/my-new-project \
   --git
 ```
 

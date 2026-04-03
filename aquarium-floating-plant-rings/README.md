@@ -1,6 +1,6 @@
 # Floating Plant Rings
 
-Migrated from the older `Documents/OpenSCAD` workspace into the newer project
+Migrated from the older flat `OpenSCAD` workspace into this per-project repo
 structure.
 
 `models/` contains the source ring variants. `exports/` contains copied STL

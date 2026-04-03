@@ -1,6 +1,6 @@
 # Emersed Plant Platforms
 
-Migrated from the older `Documents/OpenSCAD` workspace into the newer project
+Migrated from the older flat `OpenSCAD` workspace into this per-project repo
 structure.
 
 `models/` contains the source `.scad` variants. `exports/` contains copied STL
