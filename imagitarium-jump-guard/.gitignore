@@ -1,0 +1,55 @@
+# ---- Exports / build artifacts ----
+exports/
+out/
+dist/
+build/
+*.stl
+*.3mf
+*.amf
+*.obj
+*.off
+*.dxf
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf
+
+# ---- OpenSCAD / CAD temporary & backup files ----
+*~
+*.bak
+*.backup
+*.tmp
+*.temp
+*.autosave
+*.orig
+
+# If you sometimes export/manipulate meshes in other tools:
+*.step
+*.stp
+*.iges
+*.igs
+
+# ---- Logs ----
+*.log
+
+# ---- OS cruft ----
+.DS_Store
+Thumbs.db
+
+# ---- Editor / IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Cursor (commonly created)
+.cursor/
+.cursor-cache/
+
+# ---- Node / Python / misc (only relevant if you add tooling later) ----
+node_modules/
+.env
+.venv/
+__pycache__/

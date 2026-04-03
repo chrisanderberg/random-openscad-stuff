@@ -1,0 +1,10 @@
+# Validation artifacts
+exports/validation-*
+
+# macOS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
