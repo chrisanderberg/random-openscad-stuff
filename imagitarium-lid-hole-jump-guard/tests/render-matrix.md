@@ -47,3 +47,8 @@ Use this as a lightweight test plan. Add cases as the project evolves.
    - Expected: bottom opening stays constant, top opening widens as angle
      increases, and offset stays on the long-side axis without breaking out of
      the flange.
+
+5. Funnel extension sweep
+   - Parameters: `feed_hole_funnel_extension_depth = 0 / 3 / 6`
+   - Expected: a conical wall can extend into the lip cavity while the exit
+     opening stays constant and the overall solid remains manifold.

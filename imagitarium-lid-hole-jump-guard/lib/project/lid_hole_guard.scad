@@ -37,6 +37,8 @@ module lid_hole_guard(
   lip_wall = 3,
   feed_hole_d = 6,
   feed_hole_funnel_angle_deg = 45,
+  feed_hole_funnel_extension_depth = 0,
+  feed_hole_funnel_wall = 1.2,
   feed_hole_offset_y = 0,
   debug = false
 ) {
@@ -52,8 +54,17 @@ module lid_hole_guard(
   lip_inner_h = max(lip_h - 2 * lip_wall, 6);
   lip_inner_r = safe_corner_radius(lip_inner_w, lip_inner_h, lip_r - lip_wall);
   feed_hole_funnel_angle = clamp(feed_hole_funnel_angle_deg, 0, 80);
-  feed_hole_top_d = feed_hole_d + 2 * top_thickness * tan(feed_hole_funnel_angle);
-  max_feed_hole_offset_y = max(flange_h / 2 - feed_hole_top_d / 2 - 0.5, 0);
+  feed_hole_extension_depth = clamp(feed_hole_funnel_extension_depth, 0, lip_depth);
+  feed_hole_funnel_wall_t = max(feed_hole_funnel_wall, 0.6);
+  feed_hole_flange_bottom_d =
+    feed_hole_d + 2 * feed_hole_extension_depth * tan(feed_hole_funnel_angle);
+  feed_hole_top_d =
+    feed_hole_flange_bottom_d + 2 * top_thickness * tan(feed_hole_funnel_angle);
+  feed_hole_extension_outer_d = feed_hole_flange_bottom_d + 2 * feed_hole_funnel_wall_t;
+  max_feed_hole_offset_y = min(
+    max(flange_h / 2 - feed_hole_top_d / 2 - 0.5, 0),
+    max(lip_inner_h / 2 - feed_hole_extension_outer_d / 2 - 0.5, 0)
+  );
   feed_hole_y = clamp(feed_hole_offset_y, -max_feed_hole_offset_y, max_feed_hole_offset_y);
 
   union() {
@@ -87,15 +98,35 @@ module lid_hole_guard(
       }
 
       if (feed_hole_d > 0) {
-        translate([0, feed_hole_y, -0.1])
-          // Wider at the installed top face, narrower where it exits into the tank.
+        translate([0, feed_hole_y, -feed_hole_extension_depth - 0.1])
+          // Continuous funnel from the installed top face down to the small exit.
           cylinder(
             d1 = feed_hole_d,
             d2 = feed_hole_top_d,
-            h = top_thickness + 0.2,
+            h = feed_hole_extension_depth + top_thickness + 0.2,
             center = false
           );
       }
+    }
+
+    if (feed_hole_d > 0 && feed_hole_extension_depth > 0) {
+      translate([0, feed_hole_y, -feed_hole_extension_depth])
+        difference() {
+          cylinder(
+            d1 = feed_hole_d + 2 * feed_hole_funnel_wall_t,
+            d2 = feed_hole_flange_bottom_d + 2 * feed_hole_funnel_wall_t,
+            h = feed_hole_extension_depth,
+            center = false
+          );
+
+          translate([0, 0, -0.1])
+            cylinder(
+              d1 = feed_hole_d,
+              d2 = feed_hole_flange_bottom_d,
+              h = feed_hole_extension_depth + 0.2,
+              center = false
+            );
+        }
     }
 
     if (debug) {
