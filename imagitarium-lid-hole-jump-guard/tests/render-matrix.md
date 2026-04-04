@@ -41,3 +41,9 @@ Use this as a lightweight test plan. Add cases as the project evolves.
    - Parameters: `lip_depth = 3 / 4.5 / 6`
    - Expected: model remains manifold and printable for lids with limited
      underside depth.
+
+4. Feed hole sweep
+   - Parameters: `feed_hole_funnel_angle_deg = 0 / 30 / 45`, `feed_hole_offset_y = -8 / 0 / 8`
+   - Expected: bottom opening stays constant, top opening widens as angle
+     increases, and offset stays on the long-side axis without breaking out of
+     the flange.

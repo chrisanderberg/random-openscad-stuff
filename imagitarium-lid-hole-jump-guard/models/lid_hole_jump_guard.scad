@@ -20,6 +20,9 @@ lip_depth = 6;
 lip_wall = 3;
 
 feed_hole_d = 6;
+feed_hole_funnel_angle_deg = 45;
+// Positive Y shifts the feed hole toward one of the long sides.
+feed_hole_offset_y = 8;
 
 $fn = 72;
 
@@ -37,5 +40,7 @@ rotate([180, 0, 0])
     lip_depth = lip_depth,
     lip_wall = lip_wall,
     feed_hole_d = feed_hole_d,
+    feed_hole_funnel_angle_deg = feed_hole_funnel_angle_deg,
+    feed_hole_offset_y = feed_hole_offset_y,
     debug = debug
   );

@@ -36,6 +36,8 @@ module lid_hole_guard(
   lip_depth = 6,
   lip_wall = 3,
   feed_hole_d = 6,
+  feed_hole_funnel_angle_deg = 45,
+  feed_hole_offset_y = 0,
   debug = false
 ) {
   lip_w = opening_w - 2 * fit_clearance;
@@ -49,6 +51,10 @@ module lid_hole_guard(
   lip_inner_w = max(lip_w - 2 * lip_wall, 6);
   lip_inner_h = max(lip_h - 2 * lip_wall, 6);
   lip_inner_r = safe_corner_radius(lip_inner_w, lip_inner_h, lip_r - lip_wall);
+  feed_hole_funnel_angle = clamp(feed_hole_funnel_angle_deg, 0, 80);
+  feed_hole_top_d = feed_hole_d + 2 * top_thickness * tan(feed_hole_funnel_angle);
+  max_feed_hole_offset_y = max(flange_h / 2 - feed_hole_top_d / 2 - 0.5, 0);
+  feed_hole_y = clamp(feed_hole_offset_y, -max_feed_hole_offset_y, max_feed_hole_offset_y);
 
   union() {
     difference() {
@@ -81,8 +87,14 @@ module lid_hole_guard(
       }
 
       if (feed_hole_d > 0) {
-        translate([0, 0, -0.1])
-          cylinder(d = feed_hole_d, h = top_thickness + 0.2);
+        translate([0, feed_hole_y, -0.1])
+          // Wider at the installed top face, narrower where it exits into the tank.
+          cylinder(
+            d1 = feed_hole_d,
+            d2 = feed_hole_top_d,
+            h = top_thickness + 0.2,
+            center = false
+          );
       }
     }
 
