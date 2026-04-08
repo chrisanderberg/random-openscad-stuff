@@ -1,0 +1,41 @@
+// lib/project/params.scad
+// Shared project parameters for the final tray and all fit-test models.
+
+debug = false;
+
+// Main tray footprint.
+tray_w = 286;
+tray_d = 150;
+tray_corner_r = 15;
+
+// Top tray shell.
+tray_floor_t = 2.4;
+tray_wall_h = 9;
+top_wall_w = 10;
+
+// Underside support lip and rear support section.
+support_lip_drop = 10;
+support_lip_w = 10;
+rear_gap_w = 28;
+rear_tongue_w = 170;
+rear_tongue_depth = 34;
+rear_tongue_t = 1.8;
+
+// Cup holder location and plug geometry.
+cup_spacing = 118;
+cup_y_from_front = 72;
+plug_top_d = 85;
+plug_bottom_d = 73;
+plug_h = 62;
+plug_clearance_z = 0;
+
+// Fit-test defaults.
+test_plug_top_ds = [84, 85, 86];
+test_spacing_values = [116, 118, 120];
+test_lip_drop_values = [8, 10, 12];
+test_rear_tongue_ts = [1.4, 1.8, 2.2];
+test_frame_wall_w = 12;
+test_front_zone_depth = 100;
+test_rear_zone_depth = 56;
+test_gap_section_w = 140;
+test_coupon_spacing = 18;
