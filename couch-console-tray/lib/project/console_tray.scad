@@ -179,7 +179,9 @@ module underside_support_mask_2d(
   rear_gap_w,
   rear_tongue_w
 ) {
-  side_segment_d = tray_d - 2 * support_lip_w;
+  // Let the side lip run all the way to the rear perimeter so the outer
+  // rounded tray outline defines a flush rounded termination at the back edge.
+  side_segment_d = tray_d;
   front_segment_y = -tray_d / 2 + support_lip_w / 2;
 
   union() {
