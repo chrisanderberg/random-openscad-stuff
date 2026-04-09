@@ -10,6 +10,10 @@ tray_corner_r = 15;
 tray_floor_t = 2.4;
 tray_wall_h = 14;
 top_wall_w = 10;
+glue_rabbet_h = 1.6;
+glue_rabbet_w = 3.2;
+glue_rabbet_side_clearance = 0.5;
+glue_rabbet_vertical_clearance = 0.25;
 
 // Underside support lip and rear support section.
 support_lip_drop = 15;

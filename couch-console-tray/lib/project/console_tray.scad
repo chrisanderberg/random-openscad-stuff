@@ -9,6 +9,8 @@ function tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h = 0) =
 function cup_center_y(tray_d, cup_y_from_front) = -tray_d / 2 + cup_y_from_front;
 function cup_rim_relief_d(plug_top_d, cup_rim_w) = plug_top_d + 2 * cup_rim_w;
 function tray_shell_center_y(front_extension = 0) = -front_extension / 2;
+function tray_base_h(tray_floor_t, cup_rim_h = 0) = tray_floor_total_t(tray_floor_t, cup_rim_h);
+function centered_rabbet_outer_inset(top_wall_w, rabbet_w) = max((top_wall_w - rabbet_w) / 2, 0);
 
 module tray_variant(
   tray_w = 286,
@@ -18,6 +20,10 @@ module tray_variant(
   tray_floor_t = 2.4,
   tray_wall_h = 9,
   top_wall_w = 10,
+  glue_rabbet_h = 1.6,
+  glue_rabbet_w = 3.2,
+  glue_rabbet_side_clearance = 0.5,
+  glue_rabbet_vertical_clearance = 0.25,
   support_lip_drop = 10,
   support_lip_w = 10,
   rear_gap_w = 28,
@@ -36,19 +42,287 @@ module tray_variant(
   debug = false
 ) {
   floor_total_t = tray_floor_total_t(tray_floor_t, cup_rim_h);
-  body_h = tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h);
+
+  union() {
+    tray_body_variant(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      front_extension = front_extension,
+      tray_corner_r = tray_corner_r,
+      tray_floor_t = tray_floor_t,
+      top_wall_w = top_wall_w,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+      support_lip_drop = support_lip_drop,
+      support_lip_w = support_lip_w,
+      rear_gap_w = rear_gap_w,
+      rear_tongue_w = rear_tongue_w,
+      rear_tongue_depth = rear_tongue_depth,
+      rear_tongue_t = rear_tongue_t,
+      cup_spacing = cup_spacing,
+      cup_y_from_front = cup_y_from_front,
+      plug_top_d = plug_top_d,
+      plug_bottom_d = plug_bottom_d,
+      plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
+      cup_rim_w = cup_rim_w,
+      cup_rim_h = cup_rim_h,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
+    );
+
+    translate([0, 0, floor_total_t])
+      tray_rim_variant(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        front_extension = front_extension,
+        tray_corner_r = tray_corner_r,
+        tray_wall_h = tray_wall_h,
+        top_wall_w = top_wall_w,
+        glue_rabbet_h = glue_rabbet_h,
+        glue_rabbet_w = glue_rabbet_w,
+        glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+        glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
+      );
+  }
+}
+
+module tray_outline_2d(tray_w, tray_d, tray_corner_r, front_extension = 0) {
+  translate([0, tray_shell_center_y(front_extension)])
+    rounded_rect_2d([tray_w, tray_d + front_extension], r = tray_corner_r);
+}
+
+module tray_pocket_2d(tray_w, tray_d, tray_corner_r, top_wall_w, front_extension = 0) {
+  translate([0, tray_shell_center_y(front_extension)])
+    rounded_rect_2d(
+      [tray_w - 2 * top_wall_w, tray_d - 2 * top_wall_w + front_extension],
+      r = max(tray_corner_r - top_wall_w, 1)
+    );
+}
+
+module rear_tongue_outline_2d(rear_tongue_w, rear_tongue_depth, rear_corner_r) {
+  rr = min(rear_corner_r, min(rear_tongue_w / 2, rear_tongue_depth));
+
+  union() {
+    translate([0, -rr / 2])
+      square([rear_tongue_w, rear_tongue_depth - rr], center = true);
+
+    if (rear_tongue_w > 2 * rr) {
+      translate([0, rear_tongue_depth / 2 - rr / 2])
+        square([rear_tongue_w - 2 * rr, rr], center = true);
+    }
+
+    for (x = [-rear_tongue_w / 2 + rr, rear_tongue_w / 2 - rr]) {
+      translate([x, rear_tongue_depth / 2 - rr])
+        circle(r = rr, $fn = 48);
+    }
+  }
+}
+
+module tray_wall_ring_2d(tray_w, tray_d, tray_corner_r, top_wall_w, front_extension = 0) {
+  difference() {
+    tray_outline_2d(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      tray_corner_r = tray_corner_r,
+      front_extension = front_extension
+    );
+
+    tray_pocket_2d(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      tray_corner_r = tray_corner_r,
+      top_wall_w = top_wall_w,
+      front_extension = front_extension
+    );
+  }
+}
+
+module tray_glue_rabbet_ring_2d(
+  tray_w,
+  tray_d,
+  tray_corner_r,
+  front_extension = 0,
+  outer_inset = 0.8,
+  ring_w = 3.2
+) {
+  safe_outer_inset = max(outer_inset, 0);
+  safe_ring_w = max(ring_w, 0);
+
+  if (safe_ring_w > 0) {
+    difference() {
+      offset(delta = -safe_outer_inset)
+        tray_outline_2d(
+          tray_w = tray_w,
+          tray_d = tray_d,
+          tray_corner_r = tray_corner_r,
+          front_extension = front_extension
+        );
+
+      offset(delta = -(safe_outer_inset + safe_ring_w))
+        tray_outline_2d(
+          tray_w = tray_w,
+          tray_d = tray_d,
+          tray_corner_r = tray_corner_r,
+          front_extension = front_extension
+        );
+    }
+  }
+}
+
+module tray_base_plate(
+  tray_w,
+  tray_d,
+  front_extension,
+  tray_corner_r,
+  floor_total_t,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
+  top_wall_w,
+  cup_spacing,
+  cup_y,
+  plug_top_d,
+  cup_rim_w,
+  cup_rim_h
+) {
+  safe_side_clearance = max(glue_rabbet_side_clearance, 0);
+  safe_vertical_clearance = max(glue_rabbet_vertical_clearance, 0);
+  groove_ring_w = max(min(glue_rabbet_w + 2 * safe_side_clearance, top_wall_w), 0);
+  groove_outer_inset = centered_rabbet_outer_inset(top_wall_w, groove_ring_w);
+  groove_depth = min(glue_rabbet_h + safe_vertical_clearance, floor_total_t);
+
+  difference() {
+    linear_extrude(height = floor_total_t)
+      tray_outline_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        front_extension = front_extension
+      );
+
+    if (cup_spacing > 0 && plug_top_d > 0 && cup_rim_w > 0 && cup_rim_h > 0) {
+      for (x = [-cup_spacing / 2, cup_spacing / 2]) {
+        // Cup-holder trim rings sit in these underside relief pockets so the tray
+        // can bear on the surrounding console surface while only the plugs protrude.
+        translate([x, cup_y, -0.01])
+          cylinder(
+            d = cup_rim_relief_d(plug_top_d, cup_rim_w),
+            h = cup_rim_h + 0.02,
+            center = false,
+            $fn = 96
+          );
+      }
+    }
+
+    if (groove_depth > 0 && top_wall_w > 0 && groove_ring_w > 0) {
+      translate([0, 0, floor_total_t - groove_depth])
+        linear_extrude(height = groove_depth + 0.02)
+          tray_glue_rabbet_ring_2d(
+            tray_w = tray_w,
+            tray_d = tray_d,
+            tray_corner_r = tray_corner_r,
+            front_extension = front_extension,
+            outer_inset = groove_outer_inset,
+            ring_w = groove_ring_w
+          );
+    }
+  }
+}
+
+module tray_rim_variant(
+  tray_w = 286,
+  tray_d = 150,
+  front_extension = 0,
+  tray_corner_r = 15,
+  tray_wall_h = 9,
+  top_wall_w = 10,
+  glue_rabbet_h = 1.6,
+  glue_rabbet_w = 3.2,
+  glue_rabbet_side_clearance = 0.5,
+  glue_rabbet_vertical_clearance = 0.25
+) {
+  safe_side_clearance = max(glue_rabbet_side_clearance, 0);
+  safe_vertical_clearance = max(glue_rabbet_vertical_clearance, 0);
+  tongue_ring_w = max(min(glue_rabbet_w, top_wall_w - 2 * safe_side_clearance), 0);
+  tongue_outer_inset = centered_rabbet_outer_inset(top_wall_w, tongue_ring_w);
+  tongue_h = max(glue_rabbet_h, 0);
+
+  if (tray_wall_h > 0 && top_wall_w > 0) {
+    union() {
+      linear_extrude(height = tray_wall_h)
+        tray_wall_ring_2d(
+          tray_w = tray_w,
+          tray_d = tray_d,
+          tray_corner_r = tray_corner_r,
+          top_wall_w = top_wall_w,
+          front_extension = front_extension
+        );
+
+      if (tongue_h > 0 && tongue_ring_w > 0) {
+        translate([0, 0, -tongue_h])
+          linear_extrude(height = tongue_h)
+            tray_glue_rabbet_ring_2d(
+              tray_w = tray_w,
+              tray_d = tray_d,
+              tray_corner_r = tray_corner_r,
+              front_extension = front_extension,
+              outer_inset = tongue_outer_inset,
+              ring_w = tongue_ring_w
+            );
+      }
+    }
+  }
+}
+
+module tray_body_variant(
+  tray_w = 286,
+  tray_d = 150,
+  front_extension = 0,
+  tray_corner_r = 15,
+  tray_floor_t = 2.4,
+  top_wall_w = 10,
+  glue_rabbet_h = 1.6,
+  glue_rabbet_w = 3.2,
+  glue_rabbet_side_clearance = 0.5,
+  glue_rabbet_vertical_clearance = 0.25,
+  support_lip_drop = 10,
+  support_lip_w = 10,
+  rear_gap_w = 28,
+  rear_tongue_w = 170,
+  rear_tongue_depth = 34,
+  rear_tongue_t = 3.6,
+  cup_spacing = 118,
+  cup_y_from_front = 72,
+  plug_top_d = 85,
+  plug_bottom_d = 73,
+  plug_h = 62,
+  plug_shell_t = 0,
+  cup_rim_w = 0,
+  cup_rim_h = 0,
+  plug_clearance_z = 0.8,
+  debug = false
+) {
+  floor_total_t = tray_floor_total_t(tray_floor_t, cup_rim_h);
+  base_h = tray_base_h(tray_floor_t, cup_rim_h);
   cup_y = cup_center_y(tray_d, cup_y_from_front);
   plug_embed_h = max(cup_rim_h + 1, 1);
   plug_cavity_embed_h = 0;
 
   union() {
-    tray_shell(
+    tray_base_plate(
       tray_w = tray_w,
       tray_d = tray_d,
       front_extension = front_extension,
       tray_corner_r = tray_corner_r,
-      body_h = body_h,
       floor_total_t = floor_total_t,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
       top_wall_w = top_wall_w,
       cup_spacing = cup_spacing,
       cup_y = cup_y,
@@ -86,88 +360,7 @@ module tray_variant(
     if (debug) {
       color([1, 0, 0, 0.35])
         translate([0, cup_y, 0])
-        cube([cup_spacing, 1, body_h], center = true);
-    }
-  }
-}
-
-module tray_outline_2d(tray_w, tray_d, tray_corner_r, front_extension = 0) {
-  translate([0, tray_shell_center_y(front_extension)])
-    rounded_rect_2d([tray_w, tray_d + front_extension], r = tray_corner_r);
-}
-
-module tray_pocket_2d(tray_w, tray_d, tray_corner_r, top_wall_w, front_extension = 0) {
-  translate([0, tray_shell_center_y(front_extension)])
-    rounded_rect_2d(
-      [tray_w - 2 * top_wall_w, tray_d - 2 * top_wall_w + front_extension],
-      r = max(tray_corner_r - top_wall_w, 1)
-    );
-}
-
-module rear_tongue_outline_2d(rear_tongue_w, rear_tongue_depth, rear_corner_r) {
-  rr = min(rear_corner_r, min(rear_tongue_w / 2, rear_tongue_depth));
-
-  union() {
-    translate([0, -rr / 2])
-      square([rear_tongue_w, rear_tongue_depth - rr], center = true);
-
-    if (rear_tongue_w > 2 * rr) {
-      translate([0, rear_tongue_depth / 2 - rr / 2])
-        square([rear_tongue_w - 2 * rr, rr], center = true);
-    }
-
-    for (x = [-rear_tongue_w / 2 + rr, rear_tongue_w / 2 - rr]) {
-      translate([x, rear_tongue_depth / 2 - rr])
-        circle(r = rr, $fn = 48);
-    }
-  }
-}
-
-module tray_shell(
-  tray_w,
-  tray_d,
-  front_extension,
-  tray_corner_r,
-  body_h,
-  floor_total_t,
-  top_wall_w,
-  cup_spacing,
-  cup_y,
-  plug_top_d,
-  cup_rim_w,
-  cup_rim_h
-) {
-  difference() {
-    linear_extrude(height = body_h)
-      tray_outline_2d(
-        tray_w = tray_w,
-        tray_d = tray_d,
-        tray_corner_r = tray_corner_r,
-        front_extension = front_extension
-      );
-
-    translate([0, 0, floor_total_t])
-      linear_extrude(height = body_h - floor_total_t + 0.01)
-      tray_pocket_2d(
-        tray_w = tray_w,
-        tray_d = tray_d,
-        tray_corner_r = tray_corner_r,
-        top_wall_w = top_wall_w,
-        front_extension = front_extension
-      );
-
-    if (cup_spacing > 0 && plug_top_d > 0 && cup_rim_w > 0 && cup_rim_h > 0) {
-      for (x = [-cup_spacing / 2, cup_spacing / 2]) {
-        // Cup-holder trim rings sit in these underside relief pockets so the tray
-        // can bear on the surrounding console surface while only the plugs protrude.
-        translate([x, cup_y, -0.01])
-          cylinder(
-            d = cup_rim_relief_d(plug_top_d, cup_rim_w),
-            h = cup_rim_h + 0.02,
-            center = false,
-            $fn = 96
-          );
-      }
+        cube([cup_spacing, 1, base_h], center = true);
     }
   }
 }

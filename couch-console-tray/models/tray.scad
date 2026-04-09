@@ -1,5 +1,5 @@
 // models/tray.scad
-// First-pass tray for a couch center console.
+// Main tray body without the removable top rim.
 
 use <../lib/project/console_tray.scad>;
 include <../lib/project/params.scad>;
@@ -8,14 +8,17 @@ include <../lib/project/params.scad>;
 // Parameters are shared from lib/project/params.scad.
 
 module main() {
-  tray_variant(
+  tray_body_variant(
     tray_w = tray_w,
     tray_d = tray_d,
     front_extension = front_extension,
     tray_corner_r = tray_corner_r,
     tray_floor_t = tray_floor_t,
-    tray_wall_h = tray_wall_h,
     top_wall_w = top_wall_w,
+    glue_rabbet_h = glue_rabbet_h,
+    glue_rabbet_w = glue_rabbet_w,
+    glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+    glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
     support_lip_drop = support_lip_drop,
     support_lip_w = support_lip_w,
     rear_gap_w = rear_gap_w,
