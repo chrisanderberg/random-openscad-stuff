@@ -48,7 +48,7 @@ console.
 - Cup holder plug top diameter fit: 90 mm
 - Cup holder plug bottom diameter fit: 78 mm
 - Cup holder plug height fit: 73 mm
-- Cup holder rim width: 7.5 mm
+- Cup holder rim width: 10 mm
 - Cup holder rim height above surrounding surface: 5 mm
 - Console width between side lips near the lip landing plane: 320 mm
 - Side lip run from the front wrap toward the back: 170 mm
@@ -67,7 +67,7 @@ console.
 - Exact left-to-right tray width across the upholstered console top.
 - Exact front-to-back position of the cup holder centers relative to the
   desired tray front edge.
-- How the tray underside should clear or register against the 7.5 mm wide,
+- How the tray underside should clear or register against the 10 mm wide,
   5 mm tall cup-holder rim without rocking or over-constraining the fit.
 - Whether the storage opening corners and wall draft require more chamfer or
   clearance on the rear tongue.
