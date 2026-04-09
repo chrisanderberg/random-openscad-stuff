@@ -23,7 +23,7 @@ module tray_variant(
   rear_gap_w = 28,
   rear_tongue_w = 170,
   rear_tongue_depth = 34,
-  rear_tongue_t = 1.8,
+  rear_tongue_t = 3.6,
   cup_spacing = 118,
   cup_y_from_front = 72,
   plug_top_d = 85,
@@ -102,6 +102,25 @@ module tray_pocket_2d(tray_w, tray_d, tray_corner_r, top_wall_w, front_extension
       [tray_w - 2 * top_wall_w, tray_d - 2 * top_wall_w + front_extension],
       r = max(tray_corner_r - top_wall_w, 1)
     );
+}
+
+module rear_tongue_outline_2d(rear_tongue_w, rear_tongue_depth, rear_corner_r) {
+  rr = min(rear_corner_r, min(rear_tongue_w / 2, rear_tongue_depth));
+
+  union() {
+    translate([0, -rr / 2])
+      square([rear_tongue_w, rear_tongue_depth - rr], center = true);
+
+    if (rear_tongue_w > 2 * rr) {
+      translate([0, rear_tongue_depth / 2 - rr / 2])
+        square([rear_tongue_w - 2 * rr, rr], center = true);
+    }
+
+    for (x = [-rear_tongue_w / 2 + rr, rear_tongue_w / 2 - rr]) {
+      translate([x, rear_tongue_depth / 2 - rr])
+        circle(r = rr, $fn = 48);
+    }
+  }
 }
 
 module tray_shell(
@@ -232,16 +251,14 @@ module underside_supports(
     translate([
       0,
       tray_d / 2 + rear_tongue_depth / 2 - rear_join_depth / 2,
-      rear_tongue_t / 2
+      0
     ])
-      cube(
-        [
-          rear_tongue_w,
-          rear_tongue_depth + rear_join_depth,
-          rear_tongue_t
-        ],
-        center = true
-      );
+      linear_extrude(height = rear_tongue_t)
+        rear_tongue_outline_2d(
+          rear_tongue_w = rear_tongue_w,
+          rear_tongue_depth = rear_tongue_depth + rear_join_depth,
+          rear_corner_r = tray_corner_r
+        );
 
     // Add a small hidden rib inside the tray body to create a real volumetric
     // union without leaving the tongue proud of the underside.

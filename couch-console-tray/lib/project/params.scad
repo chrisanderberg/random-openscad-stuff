@@ -23,7 +23,7 @@ rear_gap_w = 28;
 rear_tongue_side_margin = 20;
 rear_tongue_w = tray_w - 2 * rear_tongue_side_margin;
 rear_tongue_depth = 34;
-rear_tongue_t = 1.8;
+rear_tongue_t = 3.6;
 
 // Cup holder location and plug geometry.
 cup_spacing = 135;
