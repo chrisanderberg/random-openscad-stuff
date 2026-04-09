@@ -27,8 +27,8 @@ rear_tongue_t = 1.8;
 
 // Cup holder location and plug geometry.
 cup_spacing = 135;
-// Confirmed from fit checks: move plugs 38 mm rearward from the prior position.
-cup_y_from_front = 110;
+// Confirmed from fit checks: move plugs 39 mm rearward from the prior position.
+cup_y_from_front = 111;
 plug_top_d = 90;
 plug_bottom_d = 78;
 plug_h = 73;
