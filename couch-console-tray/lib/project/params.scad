@@ -12,7 +12,7 @@ tray_wall_h = 9;
 top_wall_w = 10;
 
 // Underside support lip and rear support section.
-support_lip_drop = 10;
+support_lip_drop = 15;
 support_lip_w = 10;
 console_clear_w = 320;
 side_lip_run = 170;
@@ -27,7 +27,8 @@ rear_tongue_t = 1.8;
 
 // Cup holder location and plug geometry.
 cup_spacing = 135;
-cup_y_from_front = 72;
+// Confirmed from fit check: move plugs 35 mm rearward from the prior position.
+cup_y_from_front = 107;
 plug_top_d = 90;
 plug_bottom_d = 78;
 plug_h = 73;
@@ -45,3 +46,4 @@ test_front_zone_depth = 100;
 test_rear_zone_depth = 56;
 test_gap_section_w = 140;
 test_coupon_spacing = 18;
+test_front_to_back_slice_w = 10;

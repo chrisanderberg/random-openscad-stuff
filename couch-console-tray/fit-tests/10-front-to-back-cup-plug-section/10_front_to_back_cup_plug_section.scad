@@ -1,7 +1,7 @@
 use <../../lib/project/console_tray.scad>;
 include <../../lib/project/params.scad>;
 
-back_gap_fit_variant(
+cup_plug_front_to_back_slice_variant(
   tray_w = tray_w,
   tray_d = tray_d,
   front_extension = front_extension,
@@ -15,5 +15,12 @@ back_gap_fit_variant(
   rear_tongue_w = rear_tongue_w,
   rear_tongue_depth = rear_tongue_depth,
   rear_tongue_t = rear_tongue_t,
-  section_w = test_gap_section_w
+  cup_spacing = cup_spacing,
+  cup_y_from_front = cup_y_from_front,
+  plug_top_d = plug_top_d,
+  plug_bottom_d = plug_bottom_d,
+  plug_h = plug_h,
+  cup_rim_w = cup_rim_w,
+  cup_rim_h = cup_rim_h,
+  slice_w = test_front_to_back_slice_w
 );
