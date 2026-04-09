@@ -19,5 +19,7 @@ front_edge_cup_zone_variant(
   plug_top_d = plug_top_d,
   plug_bottom_d = plug_bottom_d,
   plug_h = plug_h,
+  cup_rim_w = cup_rim_w,
+  cup_rim_h = cup_rim_h,
   front_zone_depth = test_front_zone_depth
 );

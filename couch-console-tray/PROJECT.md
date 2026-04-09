@@ -14,6 +14,8 @@ The tray should:
   opening
 - keep the rear support section thin enough that the existing lid can rest on
   it without requiring any latch feature
+- sit flat over the console while clearing the raised cup-holder trim rings
+  with underside relief pockets so only the locating plugs protrude downward
 
 ## Console interpretation
 From the photos, the console appears to have:
@@ -39,6 +41,18 @@ measurements.
 - Rear tongue into storage area: about 34 mm
 - Rear tongue thickness target for lid support: about 1.8 mm
 
+## Confirmed follow-up measurements
+These values were refined after printing and checking fit on the actual couch
+console.
+
+- Cup holder plug top diameter fit: 90 mm
+- Cup holder plug bottom diameter fit: 78 mm
+- Cup holder plug height fit: 73 mm
+- Cup holder rim width: 7.5 mm
+- Cup holder rim height above surrounding surface: 5 mm
+- Console width between side lips near the lip landing plane: 320 mm
+- Side lip run from the front wrap toward the back: 170 mm
+
 ## Modeling approach
 - Use a parameterized tray body with a shallow top pocket.
 - Keep the top model in `models/` and reusable geometry in `lib/project/`.
@@ -53,6 +67,8 @@ measurements.
 - Exact left-to-right tray width across the upholstered console top.
 - Exact front-to-back position of the cup holder centers relative to the
   desired tray front edge.
+- How the tray underside should clear or register against the 7.5 mm wide,
+  5 mm tall cup-holder rim without rocking or over-constraining the fit.
 - Whether the storage opening corners and wall draft require more chamfer or
   clearance on the rear tongue.
 - How much load the rear lid-support section should safely carry in use.

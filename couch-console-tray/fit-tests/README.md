@@ -11,6 +11,7 @@ shared parameters rather than rewriting the test geometry.
 - `03-rear-tongue-lid-support`: verifies rear tongue and lid-rest geometry
 - `04-front-edge-cup-zone`: verifies cup locations relative to tray front edge
 - `05-back-gap-fit`: verifies back-side gap alignment
-- `06-lip-depth-tester`: compares support lip depth variants
-- `07-clearance-coupons`: compares rear tongue thickness and plug diameter
+- `06-lip-depth-tester`: verifies support lip depth at the front corner
+- `07-clearance-coupons`: verifies rear tongue thickness with a simple coupon
 - `08-perimeter-fit-frame`: verifies overall footprint and support lip landing
+- `09-front-corner-wrap-fit`: prints one mirrored half of the lip-only front-and-sides wrap so the full test can be glued from two halves

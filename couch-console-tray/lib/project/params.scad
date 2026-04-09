@@ -4,8 +4,6 @@
 debug = false;
 
 // Main tray footprint.
-tray_w = 286;
-tray_d = 150;
 tray_corner_r = 15;
 
 // Top tray shell.
@@ -16,18 +14,24 @@ top_wall_w = 10;
 // Underside support lip and rear support section.
 support_lip_drop = 10;
 support_lip_w = 10;
+console_clear_w = 320;
+side_lip_run = 170;
+tray_w = console_clear_w + 2 * support_lip_w;
+tray_d = side_lip_run + support_lip_w;
 rear_gap_w = 28;
 rear_tongue_w = 170;
 rear_tongue_depth = 34;
 rear_tongue_t = 1.8;
 
 // Cup holder location and plug geometry.
-cup_spacing = 118;
+cup_spacing = 135;
 cup_y_from_front = 72;
-plug_top_d = 85;
-plug_bottom_d = 73;
-plug_h = 62;
+plug_top_d = 90;
+plug_bottom_d = 78;
+plug_h = 73;
 plug_clearance_z = 0;
+cup_rim_w = 7.5;
+cup_rim_h = 5;
 
 // Fit-test defaults.
 test_plug_top_ds = [84, 85, 86];
