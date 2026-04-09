@@ -11,6 +11,7 @@ module main() {
   tray_variant(
     tray_w = tray_w,
     tray_d = tray_d,
+    front_extension = front_extension,
     tray_corner_r = tray_corner_r,
     tray_floor_t = tray_floor_t,
     tray_wall_h = tray_wall_h,

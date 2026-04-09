@@ -8,10 +8,12 @@ function tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h = 0) =
   tray_floor_total_t(tray_floor_t, cup_rim_h) + tray_wall_h;
 function cup_center_y(tray_d, cup_y_from_front) = -tray_d / 2 + cup_y_from_front;
 function cup_rim_relief_d(plug_top_d, cup_rim_w) = plug_top_d + 2 * cup_rim_w;
+function tray_shell_center_y(front_extension = 0) = -front_extension / 2;
 
 module tray_variant(
   tray_w = 286,
   tray_d = 150,
+  front_extension = 0,
   tray_corner_r = 15,
   tray_floor_t = 2.4,
   tray_wall_h = 9,
@@ -41,6 +43,7 @@ module tray_variant(
     tray_shell(
       tray_w = tray_w,
       tray_d = tray_d,
+      front_extension = front_extension,
       tray_corner_r = tray_corner_r,
       body_h = body_h,
       floor_total_t = floor_total_t,
@@ -84,20 +87,23 @@ module tray_variant(
   }
 }
 
-module tray_outline_2d(tray_w, tray_d, tray_corner_r) {
-  rounded_rect_2d([tray_w, tray_d], r = tray_corner_r);
+module tray_outline_2d(tray_w, tray_d, tray_corner_r, front_extension = 0) {
+  translate([0, tray_shell_center_y(front_extension)])
+    rounded_rect_2d([tray_w, tray_d + front_extension], r = tray_corner_r);
 }
 
-module tray_pocket_2d(tray_w, tray_d, tray_corner_r, top_wall_w) {
-  rounded_rect_2d(
-    [tray_w - 2 * top_wall_w, tray_d - 2 * top_wall_w],
-    r = max(tray_corner_r - top_wall_w, 1)
-  );
+module tray_pocket_2d(tray_w, tray_d, tray_corner_r, top_wall_w, front_extension = 0) {
+  translate([0, tray_shell_center_y(front_extension)])
+    rounded_rect_2d(
+      [tray_w - 2 * top_wall_w, tray_d - 2 * top_wall_w + front_extension],
+      r = max(tray_corner_r - top_wall_w, 1)
+    );
 }
 
 module tray_shell(
   tray_w,
   tray_d,
+  front_extension,
   tray_corner_r,
   body_h,
   floor_total_t,
@@ -110,11 +116,22 @@ module tray_shell(
 ) {
   difference() {
     linear_extrude(height = body_h)
-      tray_outline_2d(tray_w, tray_d, tray_corner_r);
+      tray_outline_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        front_extension = front_extension
+      );
 
     translate([0, 0, floor_total_t])
       linear_extrude(height = body_h - floor_total_t + 0.01)
-      tray_pocket_2d(tray_w, tray_d, tray_corner_r, top_wall_w);
+      tray_pocket_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        top_wall_w = top_wall_w,
+        front_extension = front_extension
+      );
 
     if (cup_spacing > 0 && plug_top_d > 0 && cup_rim_w > 0 && cup_rim_h > 0) {
       for (x = [-cup_spacing / 2, cup_spacing / 2]) {

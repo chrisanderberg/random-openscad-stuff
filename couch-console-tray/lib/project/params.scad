@@ -18,8 +18,10 @@ console_clear_w = 320;
 side_lip_run = 170;
 tray_w = console_clear_w + 2 * support_lip_w;
 tray_d = side_lip_run + support_lip_w;
+front_extension = 35;
 rear_gap_w = 28;
-rear_tongue_w = 170;
+rear_tongue_side_margin = 20;
+rear_tongue_w = tray_w - 2 * rear_tongue_side_margin;
 rear_tongue_depth = 34;
 rear_tongue_t = 1.8;
 
