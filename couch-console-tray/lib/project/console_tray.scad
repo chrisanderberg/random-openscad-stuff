@@ -29,6 +29,7 @@ module tray_variant(
   plug_top_d = 85,
   plug_bottom_d = 73,
   plug_h = 62,
+  plug_shell_t = 0,
   cup_rim_w = 0,
   cup_rim_h = 0,
   plug_clearance_z = 0.8,
@@ -38,6 +39,7 @@ module tray_variant(
   body_h = tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h);
   cup_y = cup_center_y(tray_d, cup_y_from_front);
   plug_embed_h = max(cup_rim_h + 1, 1);
+  plug_cavity_embed_h = 0;
 
   union() {
     tray_shell(
@@ -68,15 +70,17 @@ module tray_variant(
     );
 
     if (cup_spacing > 0 && plug_top_d > 0 && plug_bottom_d > 0 && plug_h > 0) {
-      for (x = [-cup_spacing / 2, cup_spacing / 2]) {
-        translate([x, cup_y, -plug_clearance_z])
-          cup_holder_plug(
-            top_d = plug_top_d,
-            bottom_d = plug_bottom_d,
-            h = plug_h,
-            embed_h = plug_embed_h
-          );
-      }
+      hollow_cup_holder_pair(
+        spacing = cup_spacing,
+        cup_y = cup_y,
+        top_d = plug_top_d,
+        bottom_d = plug_bottom_d,
+        h = plug_h,
+        shell_t = plug_shell_t,
+        plug_clearance_z = plug_clearance_z,
+        embed_h = plug_embed_h,
+        cavity_embed_h = plug_cavity_embed_h
+      );
     }
 
     if (debug) {
@@ -259,6 +263,40 @@ module cup_holder_pair(spacing, cup_y, top_d, bottom_d, h, plug_clearance_z = 0,
   for (x = [-spacing / 2, spacing / 2]) {
     translate([x, cup_y, -plug_clearance_z])
       cup_holder_plug(top_d = top_d, bottom_d = bottom_d, h = h, embed_h = embed_h);
+  }
+}
+
+module hollow_cup_holder_pair(
+  spacing,
+  cup_y,
+  top_d,
+  bottom_d,
+  h,
+  shell_t = 0,
+  plug_clearance_z = 0,
+  embed_h = 0,
+  cavity_embed_h = -1
+) {
+  inner_top_d = max(top_d - 2 * shell_t, 0);
+  inner_bottom_d = max(bottom_d - 2 * shell_t, 0);
+  cavity_h = cavity_embed_h < 0 ? embed_h : cavity_embed_h;
+
+  for (x = [-spacing / 2, spacing / 2]) {
+    translate([x, cup_y, -plug_clearance_z])
+      difference() {
+        cup_holder_plug(top_d = top_d, bottom_d = bottom_d, h = h, embed_h = embed_h);
+
+        if (shell_t > 0 && inner_top_d > 0 && inner_bottom_d > 0 && h > 0) {
+          // Start the cavity from the plug bottom so the plug remains a shell.
+          translate([0, 0, -0.01])
+            cup_holder_plug(
+              top_d = inner_top_d,
+              bottom_d = inner_bottom_d,
+              h = h,
+              embed_h = cavity_h + 0.02
+            );
+        }
+      }
   }
 }
 
@@ -447,17 +485,20 @@ module cup_plug_front_to_back_slice_variant(
   plug_top_d,
   plug_bottom_d,
   plug_h,
+  plug_shell_t,
   cup_rim_w,
   cup_rim_h,
   slice_w
 ) {
   body_h = tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h);
   plug_x = cup_spacing / 2;
-  cutout_w = tray_w + front_extension + rear_tongue_depth + plug_top_d + 40;
+  cutout_w = tray_w;
   cutout_d = tray_d + front_extension + rear_tongue_depth + 40;
   cutout_h = plug_h + body_h + support_lip_drop + 4;
   cutout_y = (-front_extension + rear_tongue_depth) / 2;
   cutout_z = (body_h - plug_h - support_lip_drop) / 2;
+  left_cutout_x = plug_x - slice_w / 2 - cutout_w / 2;
+  right_cutout_x = plug_x + slice_w / 2 + cutout_w / 2;
 
   difference() {
     tray_variant(
@@ -479,18 +520,19 @@ module cup_plug_front_to_back_slice_variant(
       plug_top_d = plug_top_d,
       plug_bottom_d = plug_bottom_d,
       plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
       cup_rim_w = cup_rim_w,
       cup_rim_h = cup_rim_h,
       plug_clearance_z = 0
     );
 
-    translate([plug_x - slice_w / 2 - cutout_w / 2, cutout_y, cutout_z])
+    translate([left_cutout_x, cutout_y, cutout_z])
       cube(
         [cutout_w, cutout_d, cutout_h],
         center = true
       );
 
-    translate([plug_x + slice_w / 2 + cutout_w / 2, cutout_y, cutout_z])
+    translate([right_cutout_x, cutout_y, cutout_z])
       cube(
         [cutout_w, cutout_d, cutout_h],
         center = true

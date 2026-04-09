@@ -8,7 +8,7 @@ tray_corner_r = 15;
 
 // Top tray shell.
 tray_floor_t = 2.4;
-tray_wall_h = 9;
+tray_wall_h = 14;
 top_wall_w = 10;
 
 // Underside support lip and rear support section.
@@ -27,11 +27,12 @@ rear_tongue_t = 1.8;
 
 // Cup holder location and plug geometry.
 cup_spacing = 135;
-// Confirmed from fit check: move plugs 35 mm rearward from the prior position.
-cup_y_from_front = 107;
+// Confirmed from fit checks: move plugs 38 mm rearward from the prior position.
+cup_y_from_front = 110;
 plug_top_d = 90;
 plug_bottom_d = 78;
 plug_h = 73;
+plug_shell_t = 1.6;
 plug_clearance_z = 0;
 cup_rim_w = 7.5;
 cup_rim_h = 5;

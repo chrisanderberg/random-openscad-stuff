@@ -20,6 +20,7 @@ cup_plug_front_to_back_slice_variant(
   plug_top_d = plug_top_d,
   plug_bottom_d = plug_bottom_d,
   plug_h = plug_h,
+  plug_shell_t = plug_shell_t,
   cup_rim_w = cup_rim_w,
   cup_rim_h = cup_rim_h,
   slice_w = test_front_to_back_slice_w

@@ -27,6 +27,7 @@ module main() {
     plug_top_d = plug_top_d,
     plug_bottom_d = plug_bottom_d,
     plug_h = plug_h,
+    plug_shell_t = plug_shell_t,
     cup_rim_w = cup_rim_w,
     cup_rim_h = cup_rim_h,
     plug_clearance_z = plug_clearance_z,
