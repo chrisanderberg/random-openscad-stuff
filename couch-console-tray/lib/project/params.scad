@@ -12,8 +12,8 @@ tray_wall_h = 14;
 top_wall_w = 10;
 glue_rabbet_h = 1.6;
 glue_rabbet_w = 3.2;
-glue_rabbet_side_clearance = 0.5;
-glue_rabbet_vertical_clearance = 0.25;
+glue_rabbet_side_clearance = 0.3;
+glue_rabbet_vertical_clearance = 0.15;
 
 // Underside support lip and rear support section.
 support_lip_drop = 15;
@@ -35,7 +35,7 @@ cup_spacing = 135;
 cup_y_from_front = 111;
 plug_top_d = 90;
 plug_bottom_d = 78;
-plug_h = 73;
+plug_h = 71;
 plug_shell_t = 1.6;
 plug_clearance_z = 0;
 cup_rim_w = 10;

@@ -34,12 +34,10 @@ difference() {
 
   if (cup_rim_w > 0 && cup_rim_h > 0) {
     for (x = [-spacing_test / 2, spacing_test / 2]) {
-      translate([x, cup_y, -0.01])
-        cylinder(
-          d = cup_rim_relief_d(plug_top_d, cup_rim_w),
-          h = cup_rim_h + 0.02,
-          center = false,
-          $fn = 96
+      translate([x, cup_y, 0])
+        cup_rim_relief_cut(
+          relief_d = cup_rim_relief_d(plug_top_d, cup_rim_w),
+          relief_h = cup_rim_h
         );
     }
   }

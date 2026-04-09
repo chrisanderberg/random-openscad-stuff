@@ -8,9 +8,23 @@ function tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h = 0) =
   tray_floor_total_t(tray_floor_t, cup_rim_h) + tray_wall_h;
 function cup_center_y(tray_d, cup_y_from_front) = -tray_d / 2 + cup_y_from_front;
 function cup_rim_relief_d(plug_top_d, cup_rim_w) = plug_top_d + 2 * cup_rim_w;
+function cup_rim_relief_taper_d(relief_d, relief_h) = relief_d + 2 * max(relief_h, 0);
 function tray_shell_center_y(front_extension = 0) = -front_extension / 2;
 function tray_base_h(tray_floor_t, cup_rim_h = 0) = tray_floor_total_t(tray_floor_t, cup_rim_h);
 function centered_rabbet_outer_inset(top_wall_w, rabbet_w) = max((top_wall_w - rabbet_w) / 2, 0);
+
+module cup_rim_relief_cut(relief_d, relief_h) {
+  if (relief_h > 0) {
+    translate([0, 0, -0.01])
+      cylinder(
+        d1 = cup_rim_relief_taper_d(relief_d, relief_h),
+        d2 = relief_d,
+        h = relief_h + 0.02,
+        center = false,
+        $fn = 96
+      );
+  }
+}
 
 module tray_variant(
   tray_w = 286,
@@ -22,8 +36,8 @@ module tray_variant(
   top_wall_w = 10,
   glue_rabbet_h = 1.6,
   glue_rabbet_w = 3.2,
-  glue_rabbet_side_clearance = 0.5,
-  glue_rabbet_vertical_clearance = 0.25,
+  glue_rabbet_side_clearance = 0.3,
+  glue_rabbet_vertical_clearance = 0.15,
   support_lip_drop = 10,
   support_lip_w = 10,
   rear_gap_w = 28,
@@ -208,12 +222,10 @@ module tray_base_plate(
       for (x = [-cup_spacing / 2, cup_spacing / 2]) {
         // Cup-holder trim rings sit in these underside relief pockets so the tray
         // can bear on the surrounding console surface while only the plugs protrude.
-        translate([x, cup_y, -0.01])
-          cylinder(
-            d = cup_rim_relief_d(plug_top_d, cup_rim_w),
-            h = cup_rim_h + 0.02,
-            center = false,
-            $fn = 96
+        translate([x, cup_y, 0])
+          cup_rim_relief_cut(
+            relief_d = cup_rim_relief_d(plug_top_d, cup_rim_w),
+            relief_h = cup_rim_h
           );
       }
     }
@@ -242,8 +254,8 @@ module tray_rim_variant(
   top_wall_w = 10,
   glue_rabbet_h = 1.6,
   glue_rabbet_w = 3.2,
-  glue_rabbet_side_clearance = 0.5,
-  glue_rabbet_vertical_clearance = 0.25
+  glue_rabbet_side_clearance = 0.3,
+  glue_rabbet_vertical_clearance = 0.15
 ) {
   safe_side_clearance = max(glue_rabbet_side_clearance, 0);
   safe_vertical_clearance = max(glue_rabbet_vertical_clearance, 0);
@@ -287,8 +299,8 @@ module tray_body_variant(
   top_wall_w = 10,
   glue_rabbet_h = 1.6,
   glue_rabbet_w = 3.2,
-  glue_rabbet_side_clearance = 0.5,
-  glue_rabbet_vertical_clearance = 0.25,
+  glue_rabbet_side_clearance = 0.3,
+  glue_rabbet_vertical_clearance = 0.15,
   support_lip_drop = 10,
   support_lip_w = 10,
   rear_gap_w = 28,
