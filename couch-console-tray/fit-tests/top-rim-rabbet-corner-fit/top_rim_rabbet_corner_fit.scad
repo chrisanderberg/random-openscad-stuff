@@ -1,11 +1,7 @@
 use <../../lib/project/console_tray.scad>;
 include <../../lib/project/params.scad>;
 
-// Print one half, then mirror it in the slicer or by setting mirror_part = true
-// for the matching opposite side.
-mirror_part = false;
-
-half_cup_plug_side_to_side_slice_variant(
+top_rim_rabbet_corner_fit_variant(
   tray_w = tray_w,
   tray_d = tray_d,
   front_extension = front_extension,
@@ -13,6 +9,11 @@ half_cup_plug_side_to_side_slice_variant(
   tray_floor_t = tray_floor_t,
   tray_wall_h = tray_wall_h,
   top_wall_w = top_wall_w,
+  rim_inner_taper = rim_inner_taper,
+  glue_rabbet_h = glue_rabbet_h,
+  glue_rabbet_w = glue_rabbet_w,
+  glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
   support_lip_drop = support_lip_drop,
   support_lip_w = support_lip_w,
   front_lip_forward_shift = front_lip_forward_shift,
@@ -32,6 +33,19 @@ half_cup_plug_side_to_side_slice_variant(
   plug_shell_t = plug_shell_t,
   cup_rim_w = cup_rim_w,
   cup_rim_h = cup_rim_h,
-  slice_w = test_side_to_side_slice_w,
-  mirror_x = mirror_part
+  splice_plate_enable = splice_plate_enable,
+  splice_plate_w = splice_plate_w,
+  splice_plate_d = splice_plate_d,
+  splice_plate_t = splice_plate_t,
+  splice_plate_corner_r = splice_plate_corner_r,
+  splice_plate_y_from_front = splice_plate_y_from_front,
+  splice_plate_side_clearance = splice_plate_side_clearance,
+  splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+  rear_splice_plate_enable = rear_splice_plate_enable,
+  rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+  plug_clearance_z = plug_clearance_z,
+  debug = debug,
+  section_size = test_rabbet_corner_section_size,
+  coupon_gap = test_rabbet_coupon_gap,
+  body_margin_from_groove = test_rabbet_body_margin_from_groove
 );

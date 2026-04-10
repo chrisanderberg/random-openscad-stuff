@@ -15,6 +15,7 @@ module main() {
     tray_corner_r = tray_corner_r,
     tray_wall_h = tray_wall_h,
     top_wall_w = top_wall_w,
+    rim_inner_taper = rim_inner_taper,
     glue_rabbet_h = glue_rabbet_h,
     glue_rabbet_w = glue_rabbet_w,
     glue_rabbet_side_clearance = glue_rabbet_side_clearance,

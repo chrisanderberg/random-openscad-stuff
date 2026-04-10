@@ -13,6 +13,7 @@ function cup_rim_relief_taper_d(relief_d, relief_h) = relief_d + 2 * max(relief_
 function tray_shell_center_y(front_extension = 0) = -front_extension / 2;
 function tray_base_h(tray_floor_t, cup_rim_h = 0) = tray_floor_total_t(tray_floor_t, cup_rim_h);
 function centered_rabbet_outer_inset(top_wall_w, rabbet_w) = max((top_wall_w - rabbet_w) / 2, 0);
+function clamped_inner_taper(top_wall_w, rim_inner_taper) = min(max(rim_inner_taper, 0), max(top_wall_w - 0.8, 0));
 function splice_plate_center_y(tray_d, splice_plate_y_from_front) =
   tray_nominal_front_y(tray_d) + splice_plate_y_from_front;
 
@@ -37,6 +38,7 @@ module tray_variant(
   tray_floor_t = 2.4,
   tray_wall_h = 9,
   top_wall_w = 10,
+  rim_inner_taper = 1.2,
   glue_rabbet_h = 1.6,
   glue_rabbet_w = 3.2,
   glue_rabbet_side_clearance = 0.3,
@@ -128,11 +130,128 @@ module tray_variant(
         tray_corner_r = tray_corner_r,
         tray_wall_h = tray_wall_h,
         top_wall_w = top_wall_w,
+        rim_inner_taper = rim_inner_taper,
         glue_rabbet_h = glue_rabbet_h,
         glue_rabbet_w = glue_rabbet_w,
         glue_rabbet_side_clearance = glue_rabbet_side_clearance,
         glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
       );
+  }
+}
+
+module assembled_tray_variant(
+  tray_w = 286,
+  tray_d = 150,
+  front_extension = 0,
+  tray_corner_r = 15,
+  tray_floor_t = 2.4,
+  tray_wall_h = 9,
+  top_wall_w = 10,
+  rim_inner_taper = 1.2,
+  glue_rabbet_h = 1.6,
+  glue_rabbet_w = 3.2,
+  glue_rabbet_side_clearance = 0.3,
+  glue_rabbet_vertical_clearance = 0.15,
+  support_lip_drop = 10,
+  support_lip_w = 10,
+  front_lip_forward_shift = 0,
+  front_lip_back_extra = 0,
+  front_lip_bottom_back_extra = 0,
+  side_lip_inner_extra = 0,
+  side_lip_bottom_inner_extra = 0,
+  rear_gap_w = 28,
+  rear_tongue_w = 170,
+  rear_tongue_depth = 34,
+  rear_tongue_t = 3.6,
+  cup_spacing = 118,
+  cup_y_from_front = 72,
+  plug_top_d = 85,
+  plug_bottom_d = 73,
+  plug_h = 62,
+  plug_shell_t = 0,
+  cup_rim_w = 0,
+  cup_rim_h = 0,
+  splice_plate_enable = false,
+  splice_plate_w = 120,
+  splice_plate_d = 18,
+  splice_plate_t = 2,
+  splice_plate_corner_r = 3,
+  splice_plate_y_from_front = 40,
+  splice_plate_side_clearance = 0.3,
+  splice_plate_vertical_clearance = 0.2,
+  rear_splice_plate_enable = false,
+  rear_splice_plate_y_from_front = 168,
+  plug_clearance_z = 0.8,
+  debug = false
+) {
+  union() {
+    tray_variant(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      front_extension = front_extension,
+      tray_corner_r = tray_corner_r,
+      tray_floor_t = tray_floor_t,
+      tray_wall_h = tray_wall_h,
+      top_wall_w = top_wall_w,
+      rim_inner_taper = rim_inner_taper,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+      support_lip_drop = support_lip_drop,
+      support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
+      rear_gap_w = rear_gap_w,
+      rear_tongue_w = rear_tongue_w,
+      rear_tongue_depth = rear_tongue_depth,
+      rear_tongue_t = rear_tongue_t,
+      cup_spacing = cup_spacing,
+      cup_y_from_front = cup_y_from_front,
+      plug_top_d = plug_top_d,
+      plug_bottom_d = plug_bottom_d,
+      plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
+      cup_rim_w = cup_rim_w,
+      cup_rim_h = cup_rim_h,
+      splice_plate_enable = splice_plate_enable,
+      splice_plate_w = splice_plate_w,
+      splice_plate_d = splice_plate_d,
+      splice_plate_t = splice_plate_t,
+      splice_plate_corner_r = splice_plate_corner_r,
+      splice_plate_y_from_front = splice_plate_y_from_front,
+      splice_plate_side_clearance = splice_plate_side_clearance,
+      splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+      rear_splice_plate_enable = rear_splice_plate_enable,
+      rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
+    );
+
+    if (splice_plate_enable) {
+      positioned_splice_plate_variant(
+        tray_d = tray_d,
+        splice_plate_w = splice_plate_w,
+        splice_plate_d = splice_plate_d,
+        splice_plate_t = splice_plate_t,
+        splice_plate_corner_r = splice_plate_corner_r,
+        splice_plate_y_from_front = splice_plate_y_from_front
+      );
+    }
+
+    if (rear_splice_plate_enable) {
+      positioned_splice_plate_variant(
+        tray_d = tray_d,
+        splice_plate_w = splice_plate_w,
+        splice_plate_d = splice_plate_d,
+        splice_plate_t = splice_plate_t,
+        splice_plate_corner_r = splice_plate_corner_r,
+        splice_plate_y_from_front = rear_splice_plate_y_from_front
+      );
+    }
   }
 }
 
@@ -345,6 +464,7 @@ module tray_rim_variant(
   tray_corner_r = 15,
   tray_wall_h = 9,
   top_wall_w = 10,
+  rim_inner_taper = 1.2,
   glue_rabbet_h = 1.6,
   glue_rabbet_w = 3.2,
   glue_rabbet_side_clearance = 0.3,
@@ -352,20 +472,55 @@ module tray_rim_variant(
 ) {
   safe_side_clearance = max(glue_rabbet_side_clearance, 0);
   safe_vertical_clearance = max(glue_rabbet_vertical_clearance, 0);
+  inner_taper = clamped_inner_taper(top_wall_w, rim_inner_taper);
   tongue_ring_w = max(min(glue_rabbet_w, top_wall_w - 2 * safe_side_clearance), 0);
   tongue_outer_inset = centered_rabbet_outer_inset(top_wall_w, tongue_ring_w);
   tongue_h = max(glue_rabbet_h, 0);
 
   if (tray_wall_h > 0 && top_wall_w > 0) {
     union() {
-      linear_extrude(height = tray_wall_h)
-        tray_wall_ring_2d(
-          tray_w = tray_w,
-          tray_d = tray_d,
-          tray_corner_r = tray_corner_r,
-          top_wall_w = top_wall_w,
-          front_extension = front_extension
-        );
+      difference() {
+        linear_extrude(height = tray_wall_h)
+          tray_outline_2d(
+            tray_w = tray_w,
+            tray_d = tray_d,
+            tray_corner_r = tray_corner_r,
+            front_extension = front_extension
+          );
+
+        if (inner_taper > 0) {
+          hull() {
+            linear_extrude(height = 0.02)
+              tray_pocket_2d(
+                tray_w = tray_w,
+                tray_d = tray_d,
+                tray_corner_r = tray_corner_r,
+                top_wall_w = top_wall_w,
+                front_extension = front_extension
+              );
+
+            translate([0, 0, tray_wall_h - 0.02])
+              linear_extrude(height = 0.02)
+                offset(delta = inner_taper)
+                  tray_pocket_2d(
+                    tray_w = tray_w,
+                    tray_d = tray_d,
+                    tray_corner_r = tray_corner_r,
+                    top_wall_w = top_wall_w,
+                    front_extension = front_extension
+                  );
+          }
+        } else {
+          linear_extrude(height = tray_wall_h)
+            tray_pocket_2d(
+              tray_w = tray_w,
+              tray_d = tray_d,
+              tray_corner_r = tray_corner_r,
+              top_wall_w = top_wall_w,
+              front_extension = front_extension
+            );
+        }
+      }
 
       if (tongue_h > 0 && tongue_ring_w > 0) {
         translate([0, 0, -tongue_h])
@@ -871,9 +1026,17 @@ module hollow_cup_holder_pair(
 module perimeter_frame_variant(
   tray_w,
   tray_d,
+  front_extension,
   tray_corner_r,
   frame_wall_w,
   tray_floor_t,
+  tray_wall_h,
+  top_wall_w,
+  rim_inner_taper,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
   support_lip_drop,
   support_lip_w,
   front_lip_forward_shift,
@@ -884,19 +1047,62 @@ module perimeter_frame_variant(
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
-  rear_tongue_t
+  rear_tongue_t,
+  cup_spacing,
+  cup_y_from_front,
+  plug_top_d,
+  plug_bottom_d,
+  plug_h,
+  plug_shell_t,
+  cup_rim_w,
+  cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug
 ) {
-  union() {
-    linear_extrude(height = tray_floor_t)
-      difference() {
-        tray_outline_2d(tray_w, tray_d, tray_corner_r);
-        tray_pocket_2d(tray_w, tray_d, tray_corner_r, frame_wall_w);
-      }
+  z_keep_top = rear_tongue_t;
+  lower_z = -plug_h - support_lip_drop - 20;
+  keep_h = z_keep_top - lower_z;
+  mask_w = tray_w + 80;
+  mask_d = tray_d + front_extension + rear_tongue_depth + 80;
+  front_lip_shift = max(front_lip_forward_shift, 0);
+  front_lip_front_y = -tray_d / 2 - front_lip_shift;
+  y_mask_d = tray_d + front_lip_shift + rear_tongue_depth + 80;
+  y_mask_center_y = front_lip_front_y + y_mask_d / 2;
+  center_cut_side_inset = 10;
+  center_cut_front_inset = 10;
+  center_cut_rear_inset = 2;
+  center_cut_w = max(tray_w - 2 * (support_lip_w + center_cut_side_inset), 0);
+  center_cut_d = max(
+    tray_d + front_lip_shift - support_lip_w - center_cut_front_inset - support_lip_w - center_cut_rear_inset,
+    0
+  );
+  center_cut_front_y = front_lip_front_y + support_lip_w + center_cut_front_inset;
+  center_cut_center_y = center_cut_front_y + center_cut_d / 2;
 
-    underside_supports(
+  intersection() {
+    assembled_tray_variant(
       tray_w = tray_w,
       tray_d = tray_d,
+      front_extension = front_extension,
       tray_corner_r = tray_corner_r,
+      tray_floor_t = tray_floor_t,
+      tray_wall_h = tray_wall_h,
+      top_wall_w = top_wall_w,
+      rim_inner_taper = rim_inner_taper,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
       front_lip_forward_shift = front_lip_forward_shift,
@@ -907,8 +1113,276 @@ module perimeter_frame_variant(
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
-      rear_tongue_t = rear_tongue_t
+      rear_tongue_t = rear_tongue_t,
+      cup_spacing = cup_spacing,
+      cup_y_from_front = cup_y_from_front,
+      plug_top_d = plug_top_d,
+      plug_bottom_d = plug_bottom_d,
+      plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
+      cup_rim_w = cup_rim_w,
+      cup_rim_h = cup_rim_h,
+      splice_plate_enable = splice_plate_enable,
+      splice_plate_w = splice_plate_w,
+      splice_plate_d = splice_plate_d,
+      splice_plate_t = splice_plate_t,
+      splice_plate_corner_r = splice_plate_corner_r,
+      splice_plate_y_from_front = splice_plate_y_from_front,
+      splice_plate_side_clearance = splice_plate_side_clearance,
+      splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+      rear_splice_plate_enable = rear_splice_plate_enable,
+      rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
     );
+
+    intersection() {
+      difference() {
+        translate([0, 0, lower_z + keep_h / 2])
+          cube([mask_w, mask_d, keep_h], center = true);
+
+        if (center_cut_w > 0 && center_cut_d > 0) {
+          translate([0, center_cut_center_y, lower_z + keep_h / 2])
+            cube([center_cut_w, center_cut_d, keep_h + 0.02], center = true);
+        }
+      }
+
+      translate([0, y_mask_center_y, lower_z + keep_h / 2])
+        cube([mask_w, y_mask_d, keep_h], center = true);
+    }
+  }
+}
+
+module half_perimeter_frame_variant(
+  tray_w,
+  tray_d,
+  front_extension,
+  tray_corner_r,
+  frame_wall_w,
+  tray_floor_t,
+  tray_wall_h,
+  top_wall_w,
+  rim_inner_taper,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
+  rear_gap_w,
+  rear_tongue_w,
+  rear_tongue_depth,
+  rear_tongue_t,
+  cup_spacing,
+  cup_y_from_front,
+  plug_top_d,
+  plug_bottom_d,
+  plug_h,
+  plug_shell_t,
+  cup_rim_w,
+  cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug,
+  keep_left_half = true
+) {
+  lower_z = -plug_h - support_lip_drop - 20;
+  z_keep_top = rear_tongue_t;
+  keep_h = z_keep_top - lower_z;
+  cut_x = max(tray_w, rear_tongue_w, cup_spacing + plug_top_d) + 20;
+  cut_y = tray_d + front_extension + rear_tongue_depth + 20;
+  cut_z = plug_h + support_lip_drop + tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h) + 40;
+  keep_sign = keep_left_half ? 1 : -1;
+
+  difference() {
+    perimeter_frame_variant(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      front_extension = front_extension,
+      tray_corner_r = tray_corner_r,
+      frame_wall_w = frame_wall_w,
+      tray_floor_t = tray_floor_t,
+      tray_wall_h = tray_wall_h,
+      top_wall_w = top_wall_w,
+      rim_inner_taper = rim_inner_taper,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+      support_lip_drop = support_lip_drop,
+      support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
+      rear_gap_w = rear_gap_w,
+      rear_tongue_w = rear_tongue_w,
+      rear_tongue_depth = rear_tongue_depth,
+      rear_tongue_t = rear_tongue_t,
+      cup_spacing = cup_spacing,
+      cup_y_from_front = cup_y_from_front,
+      plug_top_d = plug_top_d,
+      plug_bottom_d = plug_bottom_d,
+      plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
+      cup_rim_w = cup_rim_w,
+      cup_rim_h = cup_rim_h,
+      splice_plate_enable = splice_plate_enable,
+      splice_plate_w = splice_plate_w,
+      splice_plate_d = splice_plate_d,
+      splice_plate_t = splice_plate_t,
+      splice_plate_corner_r = splice_plate_corner_r,
+      splice_plate_y_from_front = splice_plate_y_from_front,
+      splice_plate_side_clearance = splice_plate_side_clearance,
+      splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+      rear_splice_plate_enable = rear_splice_plate_enable,
+      rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
+    );
+
+    translate([keep_sign * cut_x / 4, 0, lower_z + keep_h / 2])
+      cube([cut_x / 2, cut_y, cut_z], center = true);
+  }
+}
+
+module cup_spacing_bridge_fit_variant(
+  tray_w,
+  tray_d,
+  front_extension,
+  tray_corner_r,
+  tray_floor_t,
+  tray_wall_h,
+  top_wall_w,
+  rim_inner_taper,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
+  rear_gap_w,
+  rear_tongue_w,
+  rear_tongue_depth,
+  rear_tongue_t,
+  cup_spacing,
+  cup_y_from_front,
+  plug_top_d,
+  plug_bottom_d,
+  plug_h,
+  plug_shell_t,
+  cup_rim_w,
+  cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug,
+  pad_margin = 6,
+  bridge_strap_w = 24
+) {
+  floor_total_t = tray_floor_total_t(tray_floor_t, cup_rim_h);
+  spacing_test = cup_spacing;
+  cup_y = cup_center_y(tray_d, cup_y_from_front);
+  relief_d = cup_rim_relief_d(plug_top_d, cup_rim_w);
+  pad_d = relief_d + 2 * pad_margin + 2;
+  tube_inner_d = max(plug_bottom_d - 10, 0);
+  z_min = -plug_h - support_lip_drop - 0.01;
+  z_h = floor_total_t + plug_h + support_lip_drop + 0.02;
+  z_center = z_min + z_h / 2;
+
+  intersection() {
+    assembled_tray_variant(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      front_extension = front_extension,
+      tray_corner_r = tray_corner_r,
+      tray_floor_t = tray_floor_t,
+      tray_wall_h = tray_wall_h,
+      top_wall_w = top_wall_w,
+      rim_inner_taper = rim_inner_taper,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+      support_lip_drop = support_lip_drop,
+      support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
+      rear_gap_w = rear_gap_w,
+      rear_tongue_w = rear_tongue_w,
+      rear_tongue_depth = rear_tongue_depth,
+      rear_tongue_t = rear_tongue_t,
+      cup_spacing = cup_spacing,
+      cup_y_from_front = cup_y_from_front,
+      plug_top_d = plug_top_d,
+      plug_bottom_d = plug_bottom_d,
+      plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
+      cup_rim_w = cup_rim_w,
+      cup_rim_h = cup_rim_h,
+      splice_plate_enable = splice_plate_enable,
+      splice_plate_w = splice_plate_w,
+      splice_plate_d = splice_plate_d,
+      splice_plate_t = splice_plate_t,
+      splice_plate_corner_r = splice_plate_corner_r,
+      splice_plate_y_from_front = splice_plate_y_from_front,
+      splice_plate_side_clearance = splice_plate_side_clearance,
+      splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+      rear_splice_plate_enable = rear_splice_plate_enable,
+      rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
+    );
+
+    difference() {
+      union() {
+        for (x = [-spacing_test / 2, spacing_test / 2]) {
+          translate([x, cup_y, z_min])
+            cylinder(h = z_h, d = pad_d, center = false, $fn = 96);
+        }
+
+        translate([0, cup_y, z_center])
+          cube([spacing_test, bridge_strap_w, z_h], center = true);
+      }
+
+      if (tube_inner_d > 0) {
+        for (x = [-spacing_test / 2, spacing_test / 2]) {
+          translate([x, cup_y, z_min - 0.01])
+            cylinder(h = z_h + 0.02, d = tube_inner_d, center = false, $fn = 96);
+        }
+      }
+    }
   }
 }
 
@@ -1082,6 +1556,11 @@ module cup_plug_front_to_back_slice_variant(
   tray_floor_t,
   tray_wall_h,
   top_wall_w,
+  rim_inner_taper,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
   support_lip_drop,
   support_lip_w,
   front_lip_forward_shift,
@@ -1101,6 +1580,18 @@ module cup_plug_front_to_back_slice_variant(
   plug_shell_t,
   cup_rim_w,
   cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug,
   slice_w
 ) {
   body_h = tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h);
@@ -1114,7 +1605,7 @@ module cup_plug_front_to_back_slice_variant(
   right_cutout_x = plug_x + slice_w / 2 + cutout_w / 2;
 
   difference() {
-    tray_variant(
+    assembled_tray_variant(
       tray_w = tray_w,
       tray_d = tray_d,
       front_extension = front_extension,
@@ -1122,6 +1613,11 @@ module cup_plug_front_to_back_slice_variant(
       tray_floor_t = tray_floor_t,
       tray_wall_h = tray_wall_h,
       top_wall_w = top_wall_w,
+      rim_inner_taper = rim_inner_taper,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
       front_lip_forward_shift = front_lip_forward_shift,
@@ -1141,7 +1637,18 @@ module cup_plug_front_to_back_slice_variant(
       plug_shell_t = plug_shell_t,
       cup_rim_w = cup_rim_w,
       cup_rim_h = cup_rim_h,
-      plug_clearance_z = 0
+      splice_plate_enable = splice_plate_enable,
+      splice_plate_w = splice_plate_w,
+      splice_plate_d = splice_plate_d,
+      splice_plate_t = splice_plate_t,
+      splice_plate_corner_r = splice_plate_corner_r,
+      splice_plate_y_from_front = splice_plate_y_from_front,
+      splice_plate_side_clearance = splice_plate_side_clearance,
+      splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+      rear_splice_plate_enable = rear_splice_plate_enable,
+      rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
     );
 
     translate([left_cutout_x, cutout_y, cutout_z])
@@ -1166,6 +1673,11 @@ module cup_plug_side_to_side_slice_variant(
   tray_floor_t,
   tray_wall_h,
   top_wall_w,
+  rim_inner_taper,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
   support_lip_drop,
   support_lip_w,
   front_lip_forward_shift,
@@ -1185,6 +1697,18 @@ module cup_plug_side_to_side_slice_variant(
   plug_shell_t,
   cup_rim_w,
   cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug,
   slice_w
 ) {
   body_h = tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h);
@@ -1198,7 +1722,7 @@ module cup_plug_side_to_side_slice_variant(
   back_cutout_y = plug_y + slice_w / 2 + cutout_d / 2;
 
   difference() {
-    tray_variant(
+    assembled_tray_variant(
       tray_w = tray_w,
       tray_d = tray_d,
       front_extension = front_extension,
@@ -1206,6 +1730,11 @@ module cup_plug_side_to_side_slice_variant(
       tray_floor_t = tray_floor_t,
       tray_wall_h = tray_wall_h,
       top_wall_w = top_wall_w,
+      rim_inner_taper = rim_inner_taper,
+      glue_rabbet_h = glue_rabbet_h,
+      glue_rabbet_w = glue_rabbet_w,
+      glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+      glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
       front_lip_forward_shift = front_lip_forward_shift,
@@ -1225,7 +1754,18 @@ module cup_plug_side_to_side_slice_variant(
       plug_shell_t = plug_shell_t,
       cup_rim_w = cup_rim_w,
       cup_rim_h = cup_rim_h,
-      plug_clearance_z = 0
+      splice_plate_enable = splice_plate_enable,
+      splice_plate_w = splice_plate_w,
+      splice_plate_d = splice_plate_d,
+      splice_plate_t = splice_plate_t,
+      splice_plate_corner_r = splice_plate_corner_r,
+      splice_plate_y_from_front = splice_plate_y_from_front,
+      splice_plate_side_clearance = splice_plate_side_clearance,
+      splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+      rear_splice_plate_enable = rear_splice_plate_enable,
+      rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+      plug_clearance_z = plug_clearance_z,
+      debug = debug
     );
 
     translate([cutout_x, front_cutout_y, cutout_z])
@@ -1250,6 +1790,11 @@ module half_cup_plug_side_to_side_slice_variant(
   tray_floor_t,
   tray_wall_h,
   top_wall_w,
+  rim_inner_taper,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
   support_lip_drop,
   support_lip_w,
   front_lip_forward_shift,
@@ -1269,6 +1814,18 @@ module half_cup_plug_side_to_side_slice_variant(
   plug_shell_t,
   cup_rim_w,
   cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug,
   slice_w,
   mirror_x = false
 ) {
@@ -1287,6 +1844,11 @@ module half_cup_plug_side_to_side_slice_variant(
         tray_floor_t = tray_floor_t,
         tray_wall_h = tray_wall_h,
         top_wall_w = top_wall_w,
+        rim_inner_taper = rim_inner_taper,
+        glue_rabbet_h = glue_rabbet_h,
+        glue_rabbet_w = glue_rabbet_w,
+        glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+        glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
         support_lip_drop = support_lip_drop,
         support_lip_w = support_lip_w,
         front_lip_forward_shift = front_lip_forward_shift,
@@ -1306,6 +1868,18 @@ module half_cup_plug_side_to_side_slice_variant(
         plug_shell_t = plug_shell_t,
         cup_rim_w = cup_rim_w,
         cup_rim_h = cup_rim_h,
+        splice_plate_enable = splice_plate_enable,
+        splice_plate_w = splice_plate_w,
+        splice_plate_d = splice_plate_d,
+        splice_plate_t = splice_plate_t,
+        splice_plate_corner_r = splice_plate_corner_r,
+        splice_plate_y_from_front = splice_plate_y_from_front,
+        splice_plate_side_clearance = splice_plate_side_clearance,
+        splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+        rear_splice_plate_enable = rear_splice_plate_enable,
+        rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+        plug_clearance_z = plug_clearance_z,
+        debug = debug,
         slice_w = slice_w
       );
 
@@ -1515,11 +2089,42 @@ module top_rim_rabbet_corner_fit_variant(
   tray_floor_t,
   tray_wall_h,
   top_wall_w,
+  rim_inner_taper,
   glue_rabbet_h,
   glue_rabbet_w,
   glue_rabbet_side_clearance,
   glue_rabbet_vertical_clearance,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
+  rear_gap_w,
+  rear_tongue_w,
+  rear_tongue_depth,
+  rear_tongue_t,
+  cup_spacing,
+  cup_y_from_front,
+  plug_top_d,
+  plug_bottom_d,
+  plug_h,
+  plug_shell_t,
+  cup_rim_w,
   cup_rim_h,
+  splice_plate_enable,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front,
+  splice_plate_side_clearance,
+  splice_plate_vertical_clearance,
+  rear_splice_plate_enable,
+  rear_splice_plate_y_from_front,
+  plug_clearance_z,
+  debug,
   section_size,
   coupon_gap,
   body_margin_from_groove
@@ -1532,8 +2137,15 @@ module top_rim_rabbet_corner_fit_variant(
     0
   );
   strip_length = section_size;
-  body_total_h = floor_total_t;
+  body_z_min = -support_lip_drop;
+  body_total_h = floor_total_t + support_lip_drop;
+  body_top_z = floor_total_t;
   rim_total_h = tray_wall_h + max(glue_rabbet_h, 0);
+  rim_z_min = -max(glue_rabbet_h, 0);
+  rim_top_z = tray_wall_h;
+  aligned_top_z = max(body_top_z, rim_top_z);
+  body_z_shift = aligned_top_z - body_top_z;
+  rim_z_shift = aligned_top_z - rim_top_z;
   front_edge_y = tray_nominal_front_y(tray_d) - front_extension;
   section_center_y = front_edge_y + strip_length / 2;
   body_source_center_x = tray_w / 2 - body_strip_w / 2;
@@ -1542,59 +2154,76 @@ module top_rim_rabbet_corner_fit_variant(
   rim_target_center_x = (coupon_gap + body_strip_w) / 2;
 
   if (body_strip_w > 0) {
-    translate([body_target_center_x, 0, 0])
+    translate([body_target_center_x, 0, body_z_shift])
       intersection() {
-        translate([-body_source_center_x, -section_center_y, floor_total_t])
-          mirror([0, 0, 1])
-            tray_base_plate(
-              tray_w = tray_w,
-              tray_d = tray_d,
-              front_extension = front_extension,
-              tray_corner_r = tray_corner_r,
-              floor_total_t = floor_total_t,
-              glue_rabbet_h = glue_rabbet_h,
-              glue_rabbet_w = glue_rabbet_w,
-              glue_rabbet_side_clearance = glue_rabbet_side_clearance,
-              glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
-              top_wall_w = top_wall_w,
-              cup_spacing = 0,
-              cup_y = 0,
-              plug_top_d = 0,
-              cup_rim_w = 0,
-              cup_rim_h = 0,
-              splice_plate_enable = false,
-              splice_plate_w = 0,
-              splice_plate_d = 0,
-              splice_plate_t = 0,
-              splice_plate_corner_r = 0,
-              splice_plate_y_from_front = 0,
-              splice_plate_side_clearance = 0,
-              splice_plate_vertical_clearance = 0
-            );
-
-        translate([0, 0, body_total_h / 2])
-          cube([body_strip_w, strip_length, body_total_h + 0.02], center = true);
-      }
-  }
-
-  translate([rim_target_center_x, 0, 0])
-    intersection() {
-      translate([-rim_source_center_x, -section_center_y, tray_wall_h])
-        mirror([0, 0, 1])
-          tray_rim_variant(
+        translate([-body_source_center_x, -section_center_y, 0])
+          tray_body_variant(
             tray_w = tray_w,
             tray_d = tray_d,
             front_extension = front_extension,
             tray_corner_r = tray_corner_r,
-            tray_wall_h = tray_wall_h,
+            tray_floor_t = tray_floor_t,
             top_wall_w = top_wall_w,
             glue_rabbet_h = glue_rabbet_h,
             glue_rabbet_w = glue_rabbet_w,
             glue_rabbet_side_clearance = glue_rabbet_side_clearance,
-            glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
+            glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+            support_lip_drop = support_lip_drop,
+            support_lip_w = support_lip_w,
+            front_lip_forward_shift = front_lip_forward_shift,
+            front_lip_back_extra = front_lip_back_extra,
+            front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+            side_lip_inner_extra = side_lip_inner_extra,
+            side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
+            rear_gap_w = rear_gap_w,
+            rear_tongue_w = rear_tongue_w,
+            rear_tongue_depth = rear_tongue_depth,
+            rear_tongue_t = rear_tongue_t,
+            cup_spacing = 0,
+            cup_y_from_front = cup_y_from_front,
+            plug_top_d = 0,
+            plug_bottom_d = 0,
+            plug_h = 0,
+            plug_shell_t = 0,
+            cup_rim_w = 0,
+            cup_rim_h = cup_rim_h,
+            splice_plate_enable = false,
+            splice_plate_w = splice_plate_w,
+            splice_plate_d = splice_plate_d,
+            splice_plate_t = splice_plate_t,
+            splice_plate_corner_r = splice_plate_corner_r,
+            splice_plate_y_from_front = splice_plate_y_from_front,
+            splice_plate_side_clearance = splice_plate_side_clearance,
+            splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+            rear_splice_plate_enable = false,
+            rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+            plug_clearance_z = 0,
+            debug = debug
           );
 
-      translate([0, 0, rim_total_h / 2])
+        translate([0, 0, body_z_min + body_total_h / 2])
+          cube([body_strip_w, strip_length, body_total_h + 0.02], center = true);
+      }
+  }
+
+  translate([rim_target_center_x, 0, rim_z_shift])
+    intersection() {
+      translate([-rim_source_center_x, -section_center_y, 0])
+        tray_rim_variant(
+          tray_w = tray_w,
+          tray_d = tray_d,
+          front_extension = front_extension,
+          tray_corner_r = tray_corner_r,
+          tray_wall_h = tray_wall_h,
+          top_wall_w = top_wall_w,
+          rim_inner_taper = rim_inner_taper,
+          glue_rabbet_h = glue_rabbet_h,
+          glue_rabbet_w = glue_rabbet_w,
+          glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+          glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
+        );
+
+      translate([0, 0, rim_z_min + rim_total_h / 2])
         cube([body_strip_w, strip_length, rim_total_h + 0.02], center = true);
     }
 }

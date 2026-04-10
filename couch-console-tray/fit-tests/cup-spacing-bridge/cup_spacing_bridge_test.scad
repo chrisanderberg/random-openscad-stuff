@@ -1,13 +1,19 @@
 use <../../lib/project/console_tray.scad>;
 include <../../lib/project/params.scad>;
 
-front_edge_cup_zone_variant(
+cup_spacing_bridge_fit_variant(
   tray_w = tray_w,
   tray_d = tray_d,
+  front_extension = front_extension,
   tray_corner_r = tray_corner_r,
   tray_floor_t = tray_floor_t,
   tray_wall_h = tray_wall_h,
   top_wall_w = top_wall_w,
+  rim_inner_taper = rim_inner_taper,
+  glue_rabbet_h = glue_rabbet_h,
+  glue_rabbet_w = glue_rabbet_w,
+  glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
   support_lip_drop = support_lip_drop,
   support_lip_w = support_lip_w,
   front_lip_forward_shift = front_lip_forward_shift,
@@ -24,7 +30,19 @@ front_edge_cup_zone_variant(
   plug_top_d = plug_top_d,
   plug_bottom_d = plug_bottom_d,
   plug_h = plug_h,
+  plug_shell_t = plug_shell_t,
   cup_rim_w = cup_rim_w,
   cup_rim_h = cup_rim_h,
-  front_zone_depth = test_front_zone_depth
+  splice_plate_enable = splice_plate_enable,
+  splice_plate_w = splice_plate_w,
+  splice_plate_d = splice_plate_d,
+  splice_plate_t = splice_plate_t,
+  splice_plate_corner_r = splice_plate_corner_r,
+  splice_plate_y_from_front = splice_plate_y_from_front,
+  splice_plate_side_clearance = splice_plate_side_clearance,
+  splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+  rear_splice_plate_enable = rear_splice_plate_enable,
+  rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
+  plug_clearance_z = plug_clearance_z,
+  debug = debug
 );

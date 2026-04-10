@@ -10,6 +10,7 @@ tray_corner_r = 15;
 tray_floor_t = 2.4;
 tray_wall_h = 14;
 top_wall_w = 10;
+rim_inner_taper = 4.0;
 glue_rabbet_h = 1.6;
 glue_rabbet_w = 3.2;
 glue_rabbet_side_clearance = 0.3;
