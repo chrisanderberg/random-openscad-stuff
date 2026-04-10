@@ -43,8 +43,11 @@ module tray_variant(
   glue_rabbet_vertical_clearance = 0.15,
   support_lip_drop = 10,
   support_lip_w = 10,
+  front_lip_forward_shift = 0,
   front_lip_back_extra = 0,
   front_lip_bottom_back_extra = 0,
+  side_lip_inner_extra = 0,
+  side_lip_bottom_inner_extra = 0,
   rear_gap_w = 28,
   rear_tongue_w = 170,
   rear_tongue_depth = 34,
@@ -86,8 +89,11 @@ module tray_variant(
       glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -390,8 +396,11 @@ module tray_body_variant(
   glue_rabbet_vertical_clearance = 0.15,
   support_lip_drop = 10,
   support_lip_w = 10,
+  front_lip_forward_shift = 0,
   front_lip_back_extra = 0,
   front_lip_bottom_back_extra = 0,
+  side_lip_inner_extra = 0,
+  side_lip_bottom_inner_extra = 0,
   rear_gap_w = 28,
   rear_tongue_w = 170,
   rear_tongue_depth = 34,
@@ -458,8 +467,11 @@ module tray_body_variant(
         tray_corner_r = tray_corner_r,
         support_lip_drop = support_lip_drop,
         support_lip_w = support_lip_w,
+        front_lip_forward_shift = front_lip_forward_shift,
         front_lip_back_extra = front_lip_back_extra,
         front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+        side_lip_inner_extra = side_lip_inner_extra,
+        side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
         rear_gap_w = rear_gap_w,
         rear_tongue_w = rear_tongue_w,
         rear_tongue_depth = rear_tongue_depth,
@@ -541,20 +553,23 @@ module underside_support_mask_2d(
   tray_w,
   tray_d,
   support_lip_w,
+  front_lip_forward_shift,
   rear_gap_w,
   rear_tongue_w
 ) {
   // Let the side lip run all the way to the rear perimeter so the outer
   // rounded tray outline defines a flush rounded termination at the back edge.
-  side_segment_d = tray_d;
-  front_segment_y = -tray_d / 2 + support_lip_w / 2;
+  front_shift = max(front_lip_forward_shift, 0);
+  side_segment_d = tray_d + front_shift;
+  side_segment_y = -front_shift / 2;
+  front_segment_y = -tray_d / 2 - front_shift + support_lip_w / 2;
 
   union() {
     translate([0, front_segment_y])
       square([tray_w, support_lip_w], center = true);
 
     for (x = [-tray_w / 2 + support_lip_w / 2, tray_w / 2 - support_lip_w / 2]) {
-      translate([x, 0])
+      translate([x, side_segment_y])
         square([support_lip_w, side_segment_d], center = true);
     }
   }
@@ -565,23 +580,98 @@ module underside_support_ring_2d(
   tray_d,
   tray_corner_r,
   support_lip_w,
+  front_lip_forward_shift,
   rear_gap_w,
   rear_tongue_w
 ) {
   intersection() {
     difference() {
-      tray_outline_2d(tray_w, tray_d, tray_corner_r);
-      tray_pocket_2d(tray_w, tray_d, tray_corner_r, support_lip_w);
+      tray_outline_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        front_extension = front_lip_forward_shift
+      );
+      tray_pocket_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        top_wall_w = support_lip_w,
+        front_extension = front_lip_forward_shift
+      );
     }
 
     underside_support_mask_2d(
       tray_w = tray_w,
       tray_d = tray_d,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w
     );
   }
+}
+
+module rounded_support_lip_volume(
+  tray_w,
+  tray_d,
+  tray_corner_r,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  rear_gap_w,
+  rear_tongue_w,
+  lip_join_h
+) {
+  translate([0, 0, -support_lip_drop])
+    linear_extrude(height = support_lip_drop + lip_join_h)
+      underside_support_ring_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        support_lip_w = support_lip_w,
+        front_lip_forward_shift = front_lip_forward_shift,
+        rear_gap_w = rear_gap_w,
+        rear_tongue_w = rear_tongue_w
+      );
+}
+
+module side_support_wedge_clip_volume(
+  tray_w,
+  tray_d,
+  tray_corner_r,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  side_lip_inner_extra,
+  lip_join_h
+) {
+  front_shift = max(front_lip_forward_shift, 0);
+  side_extra = max(side_lip_inner_extra, 0);
+  side_segment_d = tray_d + front_shift;
+  side_segment_y = -front_shift / 2;
+  side_clip_w = support_lip_w + side_extra;
+
+  translate([0, 0, -support_lip_drop])
+    linear_extrude(height = support_lip_drop + lip_join_h)
+      intersection() {
+        tray_outline_2d(
+          tray_w = tray_w,
+          tray_d = tray_d,
+          tray_corner_r = tray_corner_r,
+          front_extension = front_shift
+        );
+
+        union() {
+          for (x = [
+            -tray_w / 2 + side_clip_w / 2,
+            tray_w / 2 - side_clip_w / 2
+          ]) {
+            translate([x, side_segment_y])
+              square([side_clip_w, side_segment_d], center = true);
+          }
+        }
+      };
 }
 
 module underside_supports(
@@ -590,8 +680,11 @@ module underside_supports(
   tray_corner_r,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift,
   front_lip_back_extra,
   front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -603,21 +696,28 @@ module underside_supports(
 
   union() {
     // Rounded support lip following the tray perimeter where support is wanted.
-    translate([0, 0, -support_lip_drop])
-      linear_extrude(height = support_lip_drop + lip_join_h)
-      underside_support_ring_2d(
-        tray_w = tray_w,
-        tray_d = tray_d,
-        tray_corner_r = tray_corner_r,
-        support_lip_w = support_lip_w,
-        rear_gap_w = rear_gap_w,
-        rear_tongue_w = rear_tongue_w
-      );
+    rounded_support_lip_volume(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      tray_corner_r = tray_corner_r,
+      support_lip_drop = support_lip_drop,
+      support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
+      rear_gap_w = rear_gap_w,
+      rear_tongue_w = rear_tongue_w,
+      lip_join_h = lip_join_h
+    );
 
-    front_lip_center_y = -tray_d / 2 + support_lip_w;
+    front_lip_shift = max(front_lip_forward_shift, 0);
+    front_lip_front_y = -tray_d / 2 - front_lip_shift;
+    front_lip_center_y = front_lip_front_y + support_lip_w;
     front_lip_span_w = max(tray_w - 2 * support_lip_w, 0);
     front_lip_top_extra = max(front_lip_back_extra, 0);
     front_lip_bottom_extra = min(max(front_lip_bottom_back_extra, 0), front_lip_top_extra);
+    side_lip_top_extra = max(side_lip_inner_extra, 0);
+    side_lip_bottom_extra = min(max(side_lip_bottom_inner_extra, 0), side_lip_top_extra);
+    side_lip_depth = tray_d + front_lip_shift;
+    side_lip_center_y = -front_lip_shift / 2;
 
     if (support_lip_drop > 0 && front_lip_span_w > 0 && front_lip_top_extra > 0) {
       // Add material only to the back face of the front lip so the outer/front
@@ -639,6 +739,61 @@ module underside_supports(
           [2, 3, 5, 4]
         ]
       );
+    }
+
+    if (support_lip_drop > 0 && side_lip_depth > 0 && side_lip_top_extra > 0) {
+      // Keep the outside faces fixed and thicken the side lips inward near
+      // the tray body with a gentler taper than the front lip.
+      intersection() {
+        side_support_wedge_clip_volume(
+          tray_w = tray_w,
+          tray_d = tray_d,
+          tray_corner_r = tray_corner_r,
+          support_lip_drop = support_lip_drop,
+          support_lip_w = support_lip_w,
+          front_lip_forward_shift = front_lip_forward_shift,
+          side_lip_inner_extra = side_lip_top_extra,
+          lip_join_h = lip_join_h
+        );
+
+        union() {
+          polyhedron(
+            points = [
+              [ tray_w / 2 - support_lip_w - side_lip_bottom_extra, -side_lip_depth / 2 + side_lip_center_y, -support_lip_drop],
+              [ tray_w / 2 - support_lip_w - side_lip_bottom_extra,  side_lip_depth / 2 + side_lip_center_y, -support_lip_drop],
+              [ tray_w / 2 - support_lip_w - side_lip_top_extra,    -side_lip_depth / 2 + side_lip_center_y, lip_join_h],
+              [ tray_w / 2 - support_lip_w - side_lip_top_extra,     side_lip_depth / 2 + side_lip_center_y, lip_join_h],
+              [ tray_w / 2 - support_lip_w,                         -side_lip_depth / 2 + side_lip_center_y, lip_join_h],
+              [ tray_w / 2 - support_lip_w,                          side_lip_depth / 2 + side_lip_center_y, lip_join_h]
+            ],
+            faces = [
+              [0, 1, 3, 2],
+              [0, 2, 4],
+              [1, 5, 3],
+              [0, 4, 5, 1],
+              [2, 3, 5, 4]
+            ]
+          );
+
+          polyhedron(
+            points = [
+              [-tray_w / 2 + support_lip_w + side_lip_bottom_extra, -side_lip_depth / 2 + side_lip_center_y, -support_lip_drop],
+              [-tray_w / 2 + support_lip_w + side_lip_bottom_extra,  side_lip_depth / 2 + side_lip_center_y, -support_lip_drop],
+              [-tray_w / 2 + support_lip_w + side_lip_top_extra,    -side_lip_depth / 2 + side_lip_center_y, lip_join_h],
+              [-tray_w / 2 + support_lip_w + side_lip_top_extra,     side_lip_depth / 2 + side_lip_center_y, lip_join_h],
+              [-tray_w / 2 + support_lip_w,                         -side_lip_depth / 2 + side_lip_center_y, lip_join_h],
+              [-tray_w / 2 + support_lip_w,                          side_lip_depth / 2 + side_lip_center_y, lip_join_h]
+            ],
+            faces = [
+              [0, 2, 3, 1],
+              [0, 4, 2],
+              [1, 3, 5],
+              [0, 1, 5, 4],
+              [2, 4, 5, 3]
+            ]
+          );
+        }
+      }
     }
 
     // Thin rear tongue that reaches into the storage opening under the lid.
@@ -721,8 +876,11 @@ module perimeter_frame_variant(
   tray_floor_t,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift,
   front_lip_back_extra,
   front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -741,8 +899,11 @@ module perimeter_frame_variant(
       tray_corner_r = tray_corner_r,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -760,8 +921,11 @@ module front_edge_cup_zone_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift,
   front_lip_back_extra,
   front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -785,8 +949,11 @@ module front_edge_cup_zone_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -816,8 +983,11 @@ module rear_tongue_test_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift,
   front_lip_back_extra,
   front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -835,8 +1005,11 @@ module rear_tongue_test_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -862,8 +1035,11 @@ module back_gap_fit_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift,
   front_lip_back_extra,
   front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -881,8 +1057,11 @@ module back_gap_fit_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -905,8 +1084,11 @@ module cup_plug_front_to_back_slice_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift,
   front_lip_back_extra,
   front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -942,8 +1124,11 @@ module cup_plug_front_to_back_slice_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -971,6 +1156,162 @@ module cup_plug_front_to_back_slice_variant(
         center = true
       );
   }
+}
+
+module cup_plug_side_to_side_slice_variant(
+  tray_w,
+  tray_d,
+  front_extension,
+  tray_corner_r,
+  tray_floor_t,
+  tray_wall_h,
+  top_wall_w,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
+  rear_gap_w,
+  rear_tongue_w,
+  rear_tongue_depth,
+  rear_tongue_t,
+  cup_spacing,
+  cup_y_from_front,
+  plug_top_d,
+  plug_bottom_d,
+  plug_h,
+  plug_shell_t,
+  cup_rim_w,
+  cup_rim_h,
+  slice_w
+) {
+  body_h = tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h);
+  plug_y = cup_center_y(tray_d, cup_y_from_front);
+  cutout_w = tray_w + 40;
+  cutout_d = tray_d + front_extension + rear_tongue_depth + 40;
+  cutout_h = plug_h + body_h + support_lip_drop + 4;
+  cutout_x = 0;
+  cutout_z = (body_h - plug_h - support_lip_drop) / 2;
+  front_cutout_y = plug_y - slice_w / 2 - cutout_d / 2;
+  back_cutout_y = plug_y + slice_w / 2 + cutout_d / 2;
+
+  difference() {
+    tray_variant(
+      tray_w = tray_w,
+      tray_d = tray_d,
+      front_extension = front_extension,
+      tray_corner_r = tray_corner_r,
+      tray_floor_t = tray_floor_t,
+      tray_wall_h = tray_wall_h,
+      top_wall_w = top_wall_w,
+      support_lip_drop = support_lip_drop,
+      support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
+      rear_gap_w = rear_gap_w,
+      rear_tongue_w = rear_tongue_w,
+      rear_tongue_depth = rear_tongue_depth,
+      rear_tongue_t = rear_tongue_t,
+      cup_spacing = cup_spacing,
+      cup_y_from_front = cup_y_from_front,
+      plug_top_d = plug_top_d,
+      plug_bottom_d = plug_bottom_d,
+      plug_h = plug_h,
+      plug_shell_t = plug_shell_t,
+      cup_rim_w = cup_rim_w,
+      cup_rim_h = cup_rim_h,
+      plug_clearance_z = 0
+    );
+
+    translate([cutout_x, front_cutout_y, cutout_z])
+      cube(
+        [cutout_w, cutout_d, cutout_h],
+        center = true
+      );
+
+    translate([cutout_x, back_cutout_y, cutout_z])
+      cube(
+        [cutout_w, cutout_d, cutout_h],
+        center = true
+      );
+  }
+}
+
+module half_cup_plug_side_to_side_slice_variant(
+  tray_w,
+  tray_d,
+  front_extension,
+  tray_corner_r,
+  tray_floor_t,
+  tray_wall_h,
+  top_wall_w,
+  support_lip_drop,
+  support_lip_w,
+  front_lip_forward_shift,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
+  side_lip_inner_extra,
+  side_lip_bottom_inner_extra,
+  rear_gap_w,
+  rear_tongue_w,
+  rear_tongue_depth,
+  rear_tongue_t,
+  cup_spacing,
+  cup_y_from_front,
+  plug_top_d,
+  plug_bottom_d,
+  plug_h,
+  plug_shell_t,
+  cup_rim_w,
+  cup_rim_h,
+  slice_w,
+  mirror_x = false
+) {
+  cut_x = max(tray_w, rear_tongue_w, cup_spacing + plug_top_d) + 20;
+  cut_y = tray_d + front_extension + rear_tongue_depth + 20;
+  cut_z = plug_h + support_lip_drop + tray_body_h(tray_floor_t, tray_wall_h, cup_rim_h) + 20;
+  x_sign = mirror_x ? -1 : 1;
+
+  mirror([mirror_x ? 1 : 0, 0, 0])
+    intersection() {
+      cup_plug_side_to_side_slice_variant(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        front_extension = front_extension,
+        tray_corner_r = tray_corner_r,
+        tray_floor_t = tray_floor_t,
+        tray_wall_h = tray_wall_h,
+        top_wall_w = top_wall_w,
+        support_lip_drop = support_lip_drop,
+        support_lip_w = support_lip_w,
+        front_lip_forward_shift = front_lip_forward_shift,
+        front_lip_back_extra = front_lip_back_extra,
+        front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+        side_lip_inner_extra = side_lip_inner_extra,
+        side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
+        rear_gap_w = rear_gap_w,
+        rear_tongue_w = rear_tongue_w,
+        rear_tongue_depth = rear_tongue_depth,
+        rear_tongue_t = rear_tongue_t,
+        cup_spacing = cup_spacing,
+        cup_y_from_front = cup_y_from_front,
+        plug_top_d = plug_top_d,
+        plug_bottom_d = plug_bottom_d,
+        plug_h = plug_h,
+        plug_shell_t = plug_shell_t,
+        cup_rim_w = cup_rim_w,
+        cup_rim_h = cup_rim_h,
+        slice_w = slice_w
+      );
+
+      translate([x_sign * cut_x / 4, 0, (tray_base_h(tray_floor_t, cup_rim_h) - plug_h - support_lip_drop) / 2])
+        cube([cut_x / 2, cut_y, cut_z], center = true);
+    }
 }
 
 module front_u_wrap_lip_fit_variant(
@@ -1059,8 +1400,11 @@ module front_corner_wrap_fit_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_forward_shift = 0,
   front_lip_back_extra = 0,
   front_lip_bottom_back_extra = 0,
+  side_lip_inner_extra = 0,
+  side_lip_bottom_inner_extra = 0,
   section_size
 ) {
   body_h = tray_body_h(tray_floor_t, tray_wall_h);
@@ -1077,8 +1421,11 @@ module front_corner_wrap_fit_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_forward_shift = front_lip_forward_shift,
       front_lip_back_extra = front_lip_back_extra,
       front_lip_bottom_back_extra = front_lip_bottom_back_extra,
+      side_lip_inner_extra = side_lip_inner_extra,
+      side_lip_bottom_inner_extra = side_lip_bottom_inner_extra,
       rear_gap_w = 0,
       rear_tongue_w = 0,
       rear_tongue_depth = 0,

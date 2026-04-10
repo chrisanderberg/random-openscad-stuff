@@ -1,9 +1,14 @@
 use <../../lib/project/console_tray.scad>;
 include <../../lib/project/params.scad>;
 
-front_edge_cup_zone_variant(
+// Print one half, then mirror it in the slicer or by setting mirror_part = true
+// for the matching opposite side.
+mirror_part = false;
+
+half_cup_plug_side_to_side_slice_variant(
   tray_w = tray_w,
   tray_d = tray_d,
+  front_extension = front_extension,
   tray_corner_r = tray_corner_r,
   tray_floor_t = tray_floor_t,
   tray_wall_h = tray_wall_h,
@@ -24,7 +29,9 @@ front_edge_cup_zone_variant(
   plug_top_d = plug_top_d,
   plug_bottom_d = plug_bottom_d,
   plug_h = plug_h,
+  plug_shell_t = plug_shell_t,
   cup_rim_w = cup_rim_w,
   cup_rim_h = cup_rim_h,
-  front_zone_depth = test_front_zone_depth
+  slice_w = test_side_to_side_slice_w,
+  mirror_x = mirror_part
 );
