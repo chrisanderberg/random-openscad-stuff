@@ -15,3 +15,5 @@ shared parameters rather than rewriting the test geometry.
 - `07-clearance-coupons`: verifies rear tongue thickness with a simple coupon
 - `08-perimeter-fit-frame`: verifies overall footprint and support lip landing
 - `09-front-corner-wrap-fit`: prints one mirrored half of the lip-only front-and-sides wrap so the full test can be glued from two halves
+- `10-front-to-back-cup-plug-section`: prints a thin center slice through one cup plug and surrounding tray geometry
+- `11-top-rim-rabbet-corner-fit`: prints matching body and rim corner coupons to verify rabbet fit before committing to full parts

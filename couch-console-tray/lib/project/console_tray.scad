@@ -1036,6 +1036,161 @@ module front_corner_wrap_fit_variant(
     }
 }
 
+module front_corner_section_cutout(
+  tray_w,
+  tray_d,
+  front_extension,
+  section_size,
+  section_z_min,
+  section_h
+) {
+  section_x = tray_w / 2 - section_size / 2;
+  section_y = tray_nominal_front_y(tray_d) - front_extension / 2 + section_size / 2;
+
+  translate([section_x, section_y, section_z_min + section_h / 2])
+    cube([section_size, section_size, section_h], center = true);
+}
+
+module front_corner_section_window_2d(
+  tray_w,
+  tray_d,
+  front_extension,
+  section_size
+) {
+  section_x = tray_w / 2 - section_size / 2;
+  section_y = tray_nominal_front_y(tray_d) - front_extension / 2 + section_size / 2;
+
+  translate([section_x, section_y])
+    square([section_size, section_size], center = true);
+}
+
+module tray_body_rabbet_side_strip_2d(
+  tray_w,
+  tray_d,
+  tray_corner_r,
+  front_extension,
+  top_wall_w,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  margin_from_groove
+) {
+  safe_side_clearance = max(glue_rabbet_side_clearance, 0);
+  groove_ring_w = max(min(glue_rabbet_w + 2 * safe_side_clearance, top_wall_w), 0);
+  keep_band_w = max(
+    centered_rabbet_outer_inset(top_wall_w, groove_ring_w) + groove_ring_w + max(margin_from_groove, 0),
+    0
+  );
+
+  section_x = tray_w / 2 - keep_band_w / 2;
+  section_y = tray_nominal_front_y(tray_d) - front_extension / 2 + tray_d;
+
+  if (keep_band_w > 0) {
+    intersection() {
+      tray_outline_2d(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        tray_corner_r = tray_corner_r,
+        front_extension = front_extension
+      );
+
+      translate([section_x, section_y])
+        square([keep_band_w, tray_d + front_extension + 2], center = true);
+    }
+  }
+}
+
+module top_rim_rabbet_corner_fit_variant(
+  tray_w,
+  tray_d,
+  front_extension,
+  tray_corner_r,
+  tray_floor_t,
+  tray_wall_h,
+  top_wall_w,
+  glue_rabbet_h,
+  glue_rabbet_w,
+  glue_rabbet_side_clearance,
+  glue_rabbet_vertical_clearance,
+  cup_rim_h,
+  section_size,
+  coupon_gap,
+  body_margin_from_groove
+) {
+  floor_total_t = tray_floor_total_t(tray_floor_t, cup_rim_h);
+  safe_side_clearance = max(glue_rabbet_side_clearance, 0);
+  groove_ring_w = max(min(glue_rabbet_w + 2 * safe_side_clearance, top_wall_w), 0);
+  body_strip_w = max(
+    centered_rabbet_outer_inset(top_wall_w, groove_ring_w) + groove_ring_w + max(body_margin_from_groove, 0),
+    0
+  );
+  strip_length = section_size;
+  body_total_h = floor_total_t;
+  rim_total_h = tray_wall_h + max(glue_rabbet_h, 0);
+  front_edge_y = tray_nominal_front_y(tray_d) - front_extension;
+  section_center_y = front_edge_y + strip_length / 2;
+  body_source_center_x = tray_w / 2 - body_strip_w / 2;
+  rim_source_center_x = tray_w / 2 - body_strip_w / 2;
+  body_target_center_x = -(coupon_gap + body_strip_w) / 2;
+  rim_target_center_x = (coupon_gap + body_strip_w) / 2;
+
+  if (body_strip_w > 0) {
+    translate([body_target_center_x, 0, 0])
+      intersection() {
+        translate([-body_source_center_x, -section_center_y, floor_total_t])
+          mirror([0, 0, 1])
+            tray_base_plate(
+              tray_w = tray_w,
+              tray_d = tray_d,
+              front_extension = front_extension,
+              tray_corner_r = tray_corner_r,
+              floor_total_t = floor_total_t,
+              glue_rabbet_h = glue_rabbet_h,
+              glue_rabbet_w = glue_rabbet_w,
+              glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+              glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+              top_wall_w = top_wall_w,
+              cup_spacing = 0,
+              cup_y = 0,
+              plug_top_d = 0,
+              cup_rim_w = 0,
+              cup_rim_h = 0,
+              splice_plate_enable = false,
+              splice_plate_w = 0,
+              splice_plate_d = 0,
+              splice_plate_t = 0,
+              splice_plate_corner_r = 0,
+              splice_plate_y_from_front = 0,
+              splice_plate_side_clearance = 0,
+              splice_plate_vertical_clearance = 0
+            );
+
+        translate([0, 0, body_total_h / 2])
+          cube([body_strip_w, strip_length, body_total_h + 0.02], center = true);
+      }
+  }
+
+  translate([rim_target_center_x, 0, 0])
+    intersection() {
+      translate([-rim_source_center_x, -section_center_y, tray_wall_h])
+        mirror([0, 0, 1])
+          tray_rim_variant(
+            tray_w = tray_w,
+            tray_d = tray_d,
+            front_extension = front_extension,
+            tray_corner_r = tray_corner_r,
+            tray_wall_h = tray_wall_h,
+            top_wall_w = top_wall_w,
+            glue_rabbet_h = glue_rabbet_h,
+            glue_rabbet_w = glue_rabbet_w,
+            glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+            glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
+          );
+
+      translate([0, 0, rim_total_h / 2])
+        cube([body_strip_w, strip_length, rim_total_h + 0.02], center = true);
+    }
+}
+
 module front_corner_lip_coupon(
   tray_corner_r,
   coupon_size,

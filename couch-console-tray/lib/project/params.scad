@@ -13,7 +13,7 @@ top_wall_w = 10;
 glue_rabbet_h = 1.6;
 glue_rabbet_w = 3.2;
 glue_rabbet_side_clearance = 0.3;
-glue_rabbet_vertical_clearance = 0.15;
+glue_rabbet_vertical_clearance = 0.5;
 
 // Underside support lip and rear support section.
 support_lip_drop = 15;
@@ -49,7 +49,7 @@ splice_plate_t = 2;
 splice_plate_corner_r = 3;
 splice_plate_y_from_front = 40;
 splice_plate_side_clearance = 0.3;
-splice_plate_vertical_clearance = 0.2;
+splice_plate_vertical_clearance = 0.5;
 rear_splice_plate_enable = true;
 rear_splice_plate_y_from_front = 184;
 
@@ -64,3 +64,6 @@ test_rear_zone_depth = 56;
 test_gap_section_w = 140;
 test_coupon_spacing = 18;
 test_front_to_back_slice_w = 10;
+test_rabbet_corner_section_size = 56;
+test_rabbet_coupon_gap = 16;
+test_rabbet_body_margin_from_groove = 15;
