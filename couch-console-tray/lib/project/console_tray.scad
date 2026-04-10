@@ -510,6 +510,25 @@ module splice_plate_variant(
   }
 }
 
+module positioned_splice_plate_variant(
+  tray_d,
+  splice_plate_w,
+  splice_plate_d,
+  splice_plate_t,
+  splice_plate_corner_r,
+  splice_plate_y_from_front
+) {
+  if (splice_plate_w > 0 && splice_plate_d > 0 && splice_plate_t > 0) {
+    translate([0, splice_plate_center_y(tray_d, splice_plate_y_from_front), 0])
+      splice_plate_variant(
+        splice_plate_w = splice_plate_w,
+        splice_plate_d = splice_plate_d,
+        splice_plate_t = splice_plate_t,
+        splice_plate_corner_r = splice_plate_corner_r
+      );
+  }
+}
+
 module underside_support_mask_2d(
   tray_w,
   tray_d,
