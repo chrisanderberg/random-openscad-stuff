@@ -11,6 +11,8 @@ back_gap_fit_variant(
   top_wall_w = top_wall_w,
   support_lip_drop = support_lip_drop,
   support_lip_w = support_lip_w,
+  front_lip_back_extra = front_lip_back_extra,
+  front_lip_bottom_back_extra = front_lip_bottom_back_extra,
   rear_gap_w = rear_gap_w,
   rear_tongue_w = rear_tongue_w,
   rear_tongue_depth = rear_tongue_depth,

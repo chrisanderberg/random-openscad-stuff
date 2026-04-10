@@ -43,6 +43,8 @@ module tray_variant(
   glue_rabbet_vertical_clearance = 0.15,
   support_lip_drop = 10,
   support_lip_w = 10,
+  front_lip_back_extra = 0,
+  front_lip_bottom_back_extra = 0,
   rear_gap_w = 28,
   rear_tongue_w = 170,
   rear_tongue_depth = 34,
@@ -84,6 +86,8 @@ module tray_variant(
       glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -386,6 +390,8 @@ module tray_body_variant(
   glue_rabbet_vertical_clearance = 0.15,
   support_lip_drop = 10,
   support_lip_w = 10,
+  front_lip_back_extra = 0,
+  front_lip_bottom_back_extra = 0,
   rear_gap_w = 28,
   rear_tongue_w = 170,
   rear_tongue_depth = 34,
@@ -452,6 +458,8 @@ module tray_body_variant(
         tray_corner_r = tray_corner_r,
         support_lip_drop = support_lip_drop,
         support_lip_w = support_lip_w,
+        front_lip_back_extra = front_lip_back_extra,
+        front_lip_bottom_back_extra = front_lip_bottom_back_extra,
         rear_gap_w = rear_gap_w,
         rear_tongue_w = rear_tongue_w,
         rear_tongue_depth = rear_tongue_depth,
@@ -582,6 +590,8 @@ module underside_supports(
   tray_corner_r,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -603,6 +613,33 @@ module underside_supports(
         rear_gap_w = rear_gap_w,
         rear_tongue_w = rear_tongue_w
       );
+
+    front_lip_center_y = -tray_d / 2 + support_lip_w;
+    front_lip_span_w = max(tray_w - 2 * support_lip_w, 0);
+    front_lip_top_extra = max(front_lip_back_extra, 0);
+    front_lip_bottom_extra = min(max(front_lip_bottom_back_extra, 0), front_lip_top_extra);
+
+    if (support_lip_drop > 0 && front_lip_span_w > 0 && front_lip_top_extra > 0) {
+      // Add material only to the back face of the front lip so the outer/front
+      // face stays fixed while the inner face tapers to fit the console curve.
+      polyhedron(
+        points = [
+          [-front_lip_span_w / 2, front_lip_center_y + front_lip_bottom_extra, -support_lip_drop],
+          [ front_lip_span_w / 2, front_lip_center_y + front_lip_bottom_extra, -support_lip_drop],
+          [-front_lip_span_w / 2, front_lip_center_y + front_lip_top_extra, lip_join_h],
+          [ front_lip_span_w / 2, front_lip_center_y + front_lip_top_extra, lip_join_h],
+          [-front_lip_span_w / 2, front_lip_center_y, lip_join_h],
+          [ front_lip_span_w / 2, front_lip_center_y, lip_join_h]
+        ],
+        faces = [
+          [0, 1, 3, 2],
+          [0, 2, 4],
+          [1, 5, 3],
+          [0, 4, 5, 1],
+          [2, 3, 5, 4]
+        ]
+      );
+    }
 
     // Thin rear tongue that reaches into the storage opening under the lid.
     // The tray underside is z=0, so the tongue must also start at z=0 and
@@ -684,6 +721,8 @@ module perimeter_frame_variant(
   tray_floor_t,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -702,6 +741,8 @@ module perimeter_frame_variant(
       tray_corner_r = tray_corner_r,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -719,6 +760,8 @@ module front_edge_cup_zone_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -742,6 +785,8 @@ module front_edge_cup_zone_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -771,6 +816,8 @@ module rear_tongue_test_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -788,6 +835,8 @@ module rear_tongue_test_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -813,6 +862,8 @@ module back_gap_fit_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -830,6 +881,8 @@ module back_gap_fit_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -852,6 +905,8 @@ module cup_plug_front_to_back_slice_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra,
+  front_lip_bottom_back_extra,
   rear_gap_w,
   rear_tongue_w,
   rear_tongue_depth,
@@ -887,6 +942,8 @@ module cup_plug_front_to_back_slice_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = rear_gap_w,
       rear_tongue_w = rear_tongue_w,
       rear_tongue_depth = rear_tongue_depth,
@@ -1002,6 +1059,8 @@ module front_corner_wrap_fit_variant(
   top_wall_w,
   support_lip_drop,
   support_lip_w,
+  front_lip_back_extra = 0,
+  front_lip_bottom_back_extra = 0,
   section_size
 ) {
   body_h = tray_body_h(tray_floor_t, tray_wall_h);
@@ -1018,6 +1077,8 @@ module front_corner_wrap_fit_variant(
       top_wall_w = top_wall_w,
       support_lip_drop = support_lip_drop,
       support_lip_w = support_lip_w,
+      front_lip_back_extra = front_lip_back_extra,
+      front_lip_bottom_back_extra = front_lip_bottom_back_extra,
       rear_gap_w = 0,
       rear_tongue_w = 0,
       rear_tongue_depth = 0,

@@ -22,6 +22,8 @@ module full_tray() {
     glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
     support_lip_drop = support_lip_drop,
     support_lip_w = support_lip_w,
+    front_lip_back_extra = front_lip_back_extra,
+    front_lip_bottom_back_extra = front_lip_bottom_back_extra,
     rear_gap_w = rear_gap_w,
     rear_tongue_w = rear_tongue_w,
     rear_tongue_depth = rear_tongue_depth,
