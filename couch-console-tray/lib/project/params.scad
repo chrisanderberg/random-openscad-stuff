@@ -27,7 +27,7 @@ rear_gap_w = 28;
 rear_tongue_side_margin = 20;
 rear_tongue_w = tray_w - 2 * rear_tongue_side_margin;
 rear_tongue_depth = 34;
-rear_tongue_t = 3.6;
+rear_tongue_t = 4.0;
 
 // Cup holder location and plug geometry.
 cup_spacing = 135;
@@ -40,6 +40,18 @@ plug_shell_t = 1.6;
 plug_clearance_z = 0;
 cup_rim_w = 10;
 cup_rim_h = 5;
+
+// Optional underside splice plate for joining printed tray halves.
+splice_plate_enable = true;
+splice_plate_w = 120;
+splice_plate_d = 18;
+splice_plate_t = 2;
+splice_plate_corner_r = 3;
+splice_plate_y_from_front = 40;
+splice_plate_side_clearance = 0.3;
+splice_plate_vertical_clearance = 0.2;
+rear_splice_plate_enable = true;
+rear_splice_plate_y_from_front = 184;
 
 // Fit-test defaults.
 test_plug_top_ds = [84, 85, 86];

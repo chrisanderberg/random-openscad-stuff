@@ -33,6 +33,16 @@ module main() {
     plug_shell_t = plug_shell_t,
     cup_rim_w = cup_rim_w,
     cup_rim_h = cup_rim_h,
+    splice_plate_enable = splice_plate_enable,
+    splice_plate_w = splice_plate_w,
+    splice_plate_d = splice_plate_d,
+    splice_plate_t = splice_plate_t,
+    splice_plate_corner_r = splice_plate_corner_r,
+    splice_plate_y_from_front = splice_plate_y_from_front,
+    splice_plate_side_clearance = splice_plate_side_clearance,
+    splice_plate_vertical_clearance = splice_plate_vertical_clearance,
+    rear_splice_plate_enable = rear_splice_plate_enable,
+    rear_splice_plate_y_from_front = rear_splice_plate_y_from_front,
     plug_clearance_z = plug_clearance_z,
     debug = debug
   );
