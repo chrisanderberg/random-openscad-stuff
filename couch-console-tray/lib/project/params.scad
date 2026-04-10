@@ -38,7 +38,7 @@ plug_bottom_d = 78;
 plug_h = 71;
 plug_shell_t = 1.6;
 plug_clearance_z = 0;
-cup_rim_w = 10;
+cup_rim_w = 7;
 cup_rim_h = 5;
 
 // Optional underside splice plate for joining printed tray halves.
