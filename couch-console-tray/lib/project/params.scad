@@ -19,7 +19,7 @@ glue_rabbet_vertical_clearance = 0.5;
 // Underside support lip and rear support section.
 support_lip_drop = 15;
 support_lip_w = 10;
-front_lip_forward_shift = 2;
+front_lip_forward_shift = 4;
 front_lip_back_extra = 5;
 front_lip_bottom_back_extra = 0;
 side_lip_inner_extra = 2.5;
