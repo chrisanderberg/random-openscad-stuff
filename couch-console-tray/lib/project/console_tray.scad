@@ -538,6 +538,71 @@ module tray_rim_variant(
   }
 }
 
+module tray_rim_piece_variant(
+  tray_w = 286,
+  tray_d = 150,
+  front_extension = 0,
+  tray_corner_r = 15,
+  tray_wall_h = 9,
+  top_wall_w = 10,
+  rim_inner_taper = 1.2,
+  glue_rabbet_h = 1.6,
+  glue_rabbet_w = 3.2,
+  glue_rabbet_side_clearance = 0.3,
+  glue_rabbet_vertical_clearance = 0.15,
+  center_piece_span_x = 250,
+  piece = "front"
+) {
+  safe_center_piece_span_x = min(max(center_piece_span_x, 0), tray_w);
+  side_piece_span_x = max((tray_w - safe_center_piece_span_x) / 2, 0);
+  shell_d = tray_d + front_extension;
+  shell_center_y = tray_shell_center_y(front_extension);
+  tongue_h = max(glue_rabbet_h, 0);
+  mask_h = tray_wall_h + tongue_h + 2;
+  mask_z = (tray_wall_h - tongue_h) / 2;
+
+  if (
+    tray_wall_h > 0 &&
+    top_wall_w > 0 &&
+    (
+      piece == "front" ||
+      piece == "back" ||
+      piece == "left" ||
+      piece == "right"
+    )
+  ) {
+    intersection() {
+      tray_rim_variant(
+        tray_w = tray_w,
+        tray_d = tray_d,
+        front_extension = front_extension,
+        tray_corner_r = tray_corner_r,
+        tray_wall_h = tray_wall_h,
+        top_wall_w = top_wall_w,
+        rim_inner_taper = rim_inner_taper,
+        glue_rabbet_h = glue_rabbet_h,
+        glue_rabbet_w = glue_rabbet_w,
+        glue_rabbet_side_clearance = glue_rabbet_side_clearance,
+        glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
+      );
+
+      if (piece == "front" || piece == "back") {
+        piece_center_y =
+          shell_center_y + (piece == "front" ? -shell_d / 4 : shell_d / 4);
+
+        translate([0, piece_center_y, mask_z])
+          cube([safe_center_piece_span_x, shell_d / 2, mask_h], center = true);
+      } else if (side_piece_span_x > 0) {
+        piece_center_x =
+          (piece == "left" ? -1 : 1) * (tray_w + safe_center_piece_span_x) / 4;
+
+        translate([piece_center_x, shell_center_y, mask_z])
+          cube([side_piece_span_x, shell_d, mask_h], center = true);
+      }
+    }
+  }
+}
+
 module tray_body_variant(
   tray_w = 286,
   tray_d = 150,

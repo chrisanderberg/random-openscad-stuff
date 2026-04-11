@@ -1,14 +1,14 @@
-// models/tray_rim.scad
-// Separate printable rim for the couch console tray.
+// models/right_rim.scad
+// Right printable tray rim segment outside the 250 mm center span.
 
 use <../lib/project/console_tray.scad>;
 include <../lib/project/params.scad>;
 
 // ---------- Public parameters (mm) ----------
-// Parameters are shared from lib/project/params.scad.
+rim_center_piece_span_x = 250;
 
 module main() {
-  tray_rim_variant(
+  tray_rim_piece_variant(
     tray_w = tray_w,
     tray_d = tray_d,
     front_extension = front_extension,
@@ -19,7 +19,9 @@ module main() {
     glue_rabbet_h = glue_rabbet_h,
     glue_rabbet_w = glue_rabbet_w,
     glue_rabbet_side_clearance = glue_rabbet_side_clearance,
-    glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance
+    glue_rabbet_vertical_clearance = glue_rabbet_vertical_clearance,
+    center_piece_span_x = rim_center_piece_span_x,
+    piece = "right"
   );
 }
 
