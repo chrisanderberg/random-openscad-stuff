@@ -39,9 +39,15 @@ rear_tongue_t = 4.0;
 cup_spacing = 135;
 // Confirmed from fit checks: move plugs 39 mm rearward from the prior position.
 cup_y_from_front = 111;
-plug_top_d = 90;
-plug_bottom_d = 78;
-plug_h = 71;
+full_plug_top_d = 90;
+full_plug_bottom_d = 78;
+full_plug_h = 71;
+plug_depth_fraction = 0.333333;
+plug_top_d = full_plug_top_d;
+plug_bottom_d =
+  plug_depth_fraction * full_plug_bottom_d +
+  (1.0 - plug_depth_fraction) * full_plug_top_d;
+plug_h = full_plug_h * plug_depth_fraction;
 plug_shell_t = 1.6;
 plug_clearance_z = 0;
 cup_rim_w = 7;
