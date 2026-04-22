@@ -3,17 +3,19 @@
 // Both forked ends come from the same point generator.
 
 // ---------- Public parameters (mm) ----------
-total_length = 235;
-body_width = 9;
-thickness = 6;
+total_length = 130;
+body_width = 5.75;
+thickness = 4.15;
 
-lower_fork_length = 20;
-upper_fork_length = 20;
-fork_gap_width = 2.6;
+lower_fork_length = 15;
+upper_fork_length = 15;
+fork_gap_width = 2.0;
 fork_depth = 4.0;
 
 bend_angle = 15;
-bend_location = 46;
+bend_location = 25;
+upper_bend_angle = 15;   // set to 0 for the original single-bend overall shape
+upper_bend_location = 25;
 
 // ---------- Vector helpers ----------
 function v_add(a, b) = [a[0] + b[0], a[1] + b[1]];
@@ -68,47 +70,68 @@ function fork_points(fork_length, width, gap_width, fork_depth) =
     [0, -outer_y]
   ];
 
-lower_body_axis = v_dir(bend_angle);
-upper_body_axis = [1, 0];
+// ---------- Centerline geometry ----------
+lower_axis = v_dir(bend_angle);
+middle_axis = [1, 0];
+upper_axis = v_dir(upper_bend_angle);
 
-lower_body_normal = v_perp(lower_body_axis);
-upper_body_normal = v_perp(upper_body_axis);
+lower_normal = v_perp(lower_axis);
+middle_normal = v_perp(middle_axis);
+upper_normal = v_perp(upper_axis);
 
 lower_tip = [0, 0];
-lower_root = v_add(lower_tip, v_scale(lower_body_axis, lower_fork_length));
-bend_point = v_add(lower_tip, v_scale(lower_body_axis, bend_location));
-upper_tip = v_add(bend_point, v_scale(upper_body_axis, total_length - bend_location));
-upper_root = v_add(upper_tip, v_scale(upper_body_axis, -upper_fork_length));
+lower_root = v_add(lower_tip, v_scale(lower_axis, lower_fork_length));
+lower_bend = v_add(lower_tip, v_scale(lower_axis, bend_location));
 
-top_bend = line_intersection(
-  v_add(lower_root, v_scale(lower_body_normal, body_width / 2)), lower_body_axis,
-  v_add(upper_root, v_scale(upper_body_normal, body_width / 2)), upper_body_axis
+middle_length = total_length - bend_location - upper_bend_location;
+upper_bend = v_add(lower_bend, v_scale(middle_axis, middle_length));
+upper_tip = v_add(upper_bend, v_scale(upper_axis, upper_bend_location));
+upper_root = v_add(upper_tip, v_scale(upper_axis, -upper_fork_length));
+
+// ---------- Four non-fork polygon points ----------
+lower_top_bend = line_intersection(
+  v_add(lower_bend, v_scale(lower_normal, body_width / 2)), lower_axis,
+  v_add(lower_bend, v_scale(middle_normal, body_width / 2)), middle_axis
 );
 
-bottom_bend = line_intersection(
-  v_add(lower_root, v_scale(lower_body_normal, -body_width / 2)), lower_body_axis,
-  v_add(upper_root, v_scale(upper_body_normal, -body_width / 2)), upper_body_axis
+upper_top_bend = line_intersection(
+  v_add(upper_bend, v_scale(middle_normal, body_width / 2)), middle_axis,
+  v_add(upper_bend, v_scale(upper_normal, body_width / 2)), upper_axis
 );
+
+upper_bottom_bend = line_intersection(
+  v_add(upper_bend, v_scale(middle_normal, -body_width / 2)), middle_axis,
+  v_add(upper_bend, v_scale(upper_normal, -body_width / 2)), upper_axis
+);
+
+lower_bottom_bend = line_intersection(
+  v_add(lower_bend, v_scale(lower_normal, -body_width / 2)), lower_axis,
+  v_add(lower_bend, v_scale(middle_normal, -body_width / 2)), middle_axis
+);
+
+// ---------- Forks ----------
+fork_profile_lower = fork_points(lower_fork_length, body_width, fork_gap_width, fork_depth);
+fork_profile_upper = fork_points(upper_fork_length, body_width, fork_gap_width, fork_depth);
 
 lower_fork = transform_points(
-  fork_points(lower_fork_length, body_width, fork_gap_width, fork_depth),
+  fork_profile_lower,
   lower_root,
-  v_scale(lower_body_axis, -1),
-  lower_body_normal
+  v_scale(lower_axis, -1),
+  lower_normal
 );
 
 upper_fork = transform_points(
-  fork_points(upper_fork_length, body_width, fork_gap_width, fork_depth),
+  fork_profile_upper,
   upper_root,
-  upper_body_axis,
-  upper_body_normal
+  upper_axis,
+  upper_normal
 );
 
 outline_points = concat(
   [lower_fork[0]],
-  [top_bend],
+  [lower_top_bend, upper_top_bend],
   upper_fork,
-  [bottom_bend],
+  [upper_bottom_bend, lower_bottom_bend],
   rev(lower_fork)
 );
 
