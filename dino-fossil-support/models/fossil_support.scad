@@ -43,12 +43,12 @@ function fork_points(fork_length, width, gap_width, fork_depth) =
     outer_y = width / 2,
     inner_y = gap_width / 2,
     prong_width = (width - gap_width) / 2,
-    tip_round = min(prong_width * 0.7, 1.2),
+    tip_round = min(prong_width * 0.55, 0.9),
     slot_root_r = min(inner_y, 1.0),
     slot_root_x = min(max(fork_depth, 3.5), fork_length - 3.0),
-    nub_height = max(0.35, prong_width * 0.18),
-    nub_start = min(slot_root_x + 1.2, fork_length - 4.8),
-    nub_end = min(nub_start + max(1.6, fork_length * 0.10), fork_length - tip_round - 0.8),
+    nub_height = max(0.28, prong_width * 0.14),
+    nub_start = min(fork_length - 3.0, slot_root_x + (fork_length - slot_root_x) * 0.58),
+    nub_end = min(fork_length - 1.8, nub_start + max(0.35, fork_length * 0.025)),
     tip_mid_y = inner_y + prong_width / 2
   ) [
     [0, outer_y],
