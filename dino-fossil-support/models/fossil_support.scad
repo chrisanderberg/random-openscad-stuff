@@ -6,6 +6,8 @@
 total_length = 130;
 body_width = 5.75;
 thickness = 4.15;
+thick_body_width = 8;
+thick_thickness = 6;
 
 lower_fork_length = 15;
 upper_fork_length = 15;
@@ -14,7 +16,7 @@ fork_depth = 4.0;
 
 bend_angle = 15;
 bend_location = 25;
-upper_bend_angle = 15;   // set to 0 for the original single-bend overall shape
+upper_bend_angle = 0;   // set to 0 for the original single-bend overall shape
 upper_bend_location = 25;
 
 // ---------- Vector helpers ----------
@@ -109,6 +111,26 @@ lower_bottom_bend = line_intersection(
   v_add(lower_bend, v_scale(middle_normal, -body_width / 2)), middle_axis
 );
 
+middle_top_start = line_intersection(
+  v_add(lower_bend, v_scale(lower_normal, thick_body_width / 2)), lower_axis,
+  v_add(lower_bend, v_scale(middle_normal, thick_body_width / 2)), middle_axis
+);
+
+middle_top_end = line_intersection(
+  v_add(upper_bend, v_scale(middle_normal, thick_body_width / 2)), middle_axis,
+  v_add(upper_bend, v_scale(upper_normal, thick_body_width / 2)), upper_axis
+);
+
+middle_bottom_end = line_intersection(
+  v_add(upper_bend, v_scale(middle_normal, -thick_body_width / 2)), middle_axis,
+  v_add(upper_bend, v_scale(upper_normal, -thick_body_width / 2)), upper_axis
+);
+
+middle_bottom_start = line_intersection(
+  v_add(lower_bend, v_scale(lower_normal, -thick_body_width / 2)), lower_axis,
+  v_add(lower_bend, v_scale(middle_normal, -thick_body_width / 2)), middle_axis
+);
+
 // ---------- Forks ----------
 fork_profile_lower = fork_points(lower_fork_length, body_width, fork_gap_width, fork_depth);
 fork_profile_upper = fork_points(upper_fork_length, body_width, fork_gap_width, fork_depth);
@@ -135,5 +157,18 @@ outline_points = concat(
   rev(lower_fork)
 );
 
-linear_extrude(height = thickness)
-  polygon(points = outline_points);
+middle_outline_points = [
+  middle_top_start,
+  middle_top_end,
+  middle_bottom_end,
+  middle_bottom_start
+];
+
+union() {
+  linear_extrude(height = thickness)
+    polygon(points = outline_points);
+
+  translate([0, 0, (thickness - thick_thickness) / 2])
+    linear_extrude(height = thick_thickness)
+      polygon(points = middle_outline_points);
+}
