@@ -4,10 +4,11 @@
 
 // ---------- Public parameters (mm) ----------
 total_length = 130;
-body_width = 5.75;
-thickness = 4.15;
+body_width = 5.55;
+thickness = 3.95;
 thick_body_width = 8;
 thick_thickness = 6;
+middle_chamfer = 0.75;
 
 lower_fork_length = 15;
 upper_fork_length = 15;
@@ -39,6 +40,9 @@ function frame_point(origin, axis, normal, p) =
 
 function transform_points(points, origin, axis, normal) =
   [for (p = points) frame_point(origin, axis, normal, p)];
+
+function safe_middle_chamfer(requested, width, height) =
+  max(0, min(requested, width / 2 - 0.01, height / 2 - 0.01));
 
 // Local fork boundary from top root to bottom root.
 // Root is at x = 0 and tip is at x = fork_length.
@@ -164,11 +168,56 @@ middle_outline_points = [
   middle_bottom_start
 ];
 
+middle_chamfer_mm = safe_middle_chamfer(
+  middle_chamfer,
+  thick_body_width,
+  thick_thickness
+);
+
+module octahedron(radius) {
+  polyhedron(
+    points = [
+      [ radius, 0, 0],
+      [-radius, 0, 0],
+      [0,  radius, 0],
+      [0, -radius, 0],
+      [0, 0,  radius],
+      [0, 0, -radius]
+    ],
+    faces = [
+      [0, 2, 4],
+      [2, 1, 4],
+      [1, 3, 4],
+      [3, 0, 4],
+      [2, 0, 5],
+      [1, 2, 5],
+      [3, 1, 5],
+      [0, 3, 5]
+    ]
+  );
+}
+
+module middle_section() {
+  z0 = (thickness - thick_thickness) / 2;
+
+  translate([0, 0, z0])
+    if (middle_chamfer_mm > 0) {
+      minkowski() {
+        translate([0, 0, middle_chamfer_mm])
+          linear_extrude(height = thick_thickness - 2 * middle_chamfer_mm)
+            offset(delta = -middle_chamfer_mm)
+              polygon(points = middle_outline_points);
+        octahedron(middle_chamfer_mm);
+      }
+    } else {
+      linear_extrude(height = thick_thickness)
+        polygon(points = middle_outline_points);
+    }
+}
+
 union() {
   linear_extrude(height = thickness)
     polygon(points = outline_points);
 
-  translate([0, 0, (thickness - thick_thickness) / 2])
-    linear_extrude(height = thick_thickness)
-      polygon(points = middle_outline_points);
+  middle_section();
 }
