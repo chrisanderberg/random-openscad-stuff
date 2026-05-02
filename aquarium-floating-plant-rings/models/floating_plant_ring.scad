@@ -3,7 +3,7 @@
 use <../lib/project/ring_profile.scad>;
 
 // ---------- Public parameters (mm) ----------
-ring_outer_diameter = 100;
+ring_outer_diameter = 150;
 cross_section_width = 8;
 cross_section_total_height = 8;
 top_angle = 30; // Angle of top surfaces in degrees.
