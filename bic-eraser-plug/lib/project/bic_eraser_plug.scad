@@ -14,8 +14,13 @@ module bic_eraser_plug(
   body_height = insert_height - effective_head_height;
   insert_radius = insert_diameter / 2;
   head_radius = effective_head_diameter / 2;
-  bottom_chamfer_radius = min(bottom_chamfer, insert_radius, insert_height / 2);
-  top_chamfer_radius = min(top_chamfer, head_radius, insert_height / 2);
+  bottom_chamfer_radius = min(bottom_chamfer, insert_radius, body_height, insert_height / 2);
+  top_chamfer_radius = min(
+    top_chamfer,
+    head_radius,
+    effective_head_height > 0 ? effective_head_height : insert_height,
+    insert_height / 2
+  );
   body_top_z = effective_head_height > 0 ? body_height : insert_height;
   top_start_z = insert_height - top_chamfer_radius;
 
