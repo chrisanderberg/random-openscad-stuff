@@ -4,8 +4,6 @@
 - All dimensions shall be expressed in millimeters.
 - The first goal shall be matching the photographed silhouette as closely as
   practical from the provided references.
-- The support shall remain a mostly straight constant-width strip with one
-  shallow bend near one end.
 - Both ends shall be visibly open forks in the outer silhouette.
 
 ## Soft requirements
