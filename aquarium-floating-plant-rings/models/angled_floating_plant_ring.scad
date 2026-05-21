@@ -6,7 +6,7 @@ use <../lib/project/ring_profile.scad>;
 ring_outer_diameter = 300;
 cross_section_width = 8;
 cross_section_total_height = 8;
-top_angle = 30; // Angle of top surfaces in degrees.
+top_angle = 45; // Angle of top surfaces in degrees.
 ring_angle = 90; // Ring sweep in degrees (360 full, 180 half, 90 quarter).
 
 // ---------- Resolution ----------
